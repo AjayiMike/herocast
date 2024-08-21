@@ -1,85 +1,85 @@
-import React, { useEffect, useState } from 'react';
-import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AccountObjectType, hydrateAccounts, useAccountStore } from '@/stores/useAccountStore';
-import { useAccount } from 'wagmi';
-import ConfirmOnchainSignerButton from '@/common/components/ConfirmOnchainSignerButton';
-import SwitchWalletButton from '@/common/components/SwitchWalletButton';
-import { QrCode } from '@/common/components/QrCode';
-import { getTimestamp } from '@/common/helpers/farcaster';
-import { WarpcastLoginStatus, getWarpcastSignerStatus } from '@/common/helpers/warpcastLogin';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { useIsMounted } from '@/common/helpers/hooks';
-import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react'
+import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AccountObjectType, hydrateAccounts, useAccountStore } from '@/stores/useAccountStore'
+import { useAccount } from 'wagmi'
+import ConfirmOnchainSignerButton from '@/common/components/ConfirmOnchainSignerButton'
+import SwitchWalletButton from '@/common/components/SwitchWalletButton'
+import { QrCode } from '@/common/components/QrCode'
+import { getTimestamp } from '@/common/helpers/farcaster'
+import { WarpcastLoginStatus, getWarpcastSignerStatus } from '@/common/helpers/warpcastLogin'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { useIsMounted } from '@/common/helpers/hooks'
+import { useRouter } from 'next/router'
 
-const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!);
+const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!)
 
 const ConnectAccountPage = () => {
-  const router = useRouter();
-  const { isConnected } = useAccount();
-  const { accounts, removeAccount, setAccountActive } = useAccountStore();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const isMounted = useIsMounted();
+  const router = useRouter()
+  const { isConnected } = useAccount()
+  const { accounts, removeAccount, setAccountActive } = useAccountStore()
+  const [isHydrated, setIsHydrated] = useState(false)
+  const isMounted = useIsMounted()
 
   useEffect(() => {
-    hydrateAccounts();
-    setIsHydrated(true);
-  }, []);
+    hydrateAccounts()
+    setIsHydrated(true)
+  }, [])
 
   const pendingAccounts = accounts.filter(
     (account) => account.status === AccountStatusType.pending && account.platform === AccountPlatformType.farcaster
-  );
-  const pendingAccount = pendingAccounts?.[0];
+  )
+  const pendingAccount = pendingAccounts?.[0]
 
   const checkStatusAndActiveAccount = async (pendingAccount: AccountObjectType) => {
-    if (!pendingAccount?.data?.signerToken) return;
+    if (!pendingAccount?.data?.signerToken) return
 
-    const deadline = pendingAccount.data?.deadline;
+    const deadline = pendingAccount.data?.deadline
     if (deadline && getTimestamp() > deadline) {
-      await removeAccount(pendingAccount.id);
-      return;
+      await removeAccount(pendingAccount.id)
+      return
     }
 
-    const { status, data } = await getWarpcastSignerStatus(pendingAccount.data.signerToken);
+    const { status, data } = await getWarpcastSignerStatus(pendingAccount.data.signerToken)
     if (status === WarpcastLoginStatus.success) {
-      const fid = data.userFid;
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
-      const user = (await neynarClient.fetchBulkUsers([fid], { viewerFid: APP_FID! })).users[0];
+      const fid = data.userFid
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
+      const user = (await neynarClient.fetchBulkUsers([fid], { viewerFid: APP_FID! })).users[0]
       await setAccountActive(pendingAccount.id, user.username, {
         platform_account_id: user.fid.toString(),
         data,
-      });
-      await hydrateAccounts();
-      router.push('/welcome/success');
+      })
+      await hydrateAccounts()
+      router.push('/welcome/success')
     }
-  };
+  }
 
   const pollForSigner = async (accountId: string) => {
-    let tries = 0;
+    let tries = 0
     while (tries < 60) {
-      tries += 1;
-      await new Promise((r) => setTimeout(r, 2000));
+      tries += 1
+      await new Promise((r) => setTimeout(r, 2000))
 
-      const account = useAccountStore.getState().accounts.find((account) => account.id === accountId);
-      if (!account) return;
-      if (!isMounted()) return;
+      const account = useAccountStore.getState().accounts.find((account) => account.id === accountId)
+      if (!account) return
+      if (!isMounted()) return
 
-      await checkStatusAndActiveAccount(account);
+      await checkStatusAndActiveAccount(account)
     }
-  };
+  }
 
   useEffect(() => {
     if (pendingAccount) {
-      pendingAccounts.forEach((account) => pollForSigner(account.id));
+      pendingAccounts.forEach((account) => pollForSigner(account.id))
     }
-  }, [pendingAccount]);
+  }, [pendingAccount])
 
   if (!isHydrated) {
-    return null;
+    return null
   }
 
   if (pendingAccounts.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -123,7 +123,7 @@ const ConnectAccountPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ConnectAccountPage;
+export default ConnectAccountPage

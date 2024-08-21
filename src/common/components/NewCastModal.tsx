@@ -1,46 +1,46 @@
-import React, { useEffect, useMemo } from 'react';
-import Modal from '@/common/components/Modal';
-import NewPostEntry from './Editor/NewCastEditor';
-import { useDraftStore } from '@/stores/useDraftStore';
-import { CastRow } from './CastRow';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { AccountSelector } from './AccountSelector';
-import { AccountStatusType } from '../constants/accounts';
-import { CastModalView, useNavigationStore } from '@/stores/useNavigationStore';
-import { useDataStore } from '@/stores/useDataStore';
-import { UUID } from 'crypto';
+import React, { useEffect, useMemo } from 'react'
+import Modal from '@/common/components/Modal'
+import NewPostEntry from './Editor/NewCastEditor'
+import { useDraftStore } from '@/stores/useDraftStore'
+import { CastRow } from './CastRow'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { AccountSelector } from './AccountSelector'
+import { AccountStatusType } from '../constants/accounts'
+import { CastModalView, useNavigationStore } from '@/stores/useNavigationStore'
+import { useDataStore } from '@/stores/useDataStore'
+import { UUID } from 'crypto'
 
 type NewCastModalProps = {
-  draftId: UUID;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+  draftId: UUID
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 const NewCastModal: React.FC<NewCastModalProps> = ({ draftId, open, setOpen }) => {
-  const { castModalView } = useNavigationStore();
-  const { selectedCast } = useDataStore();
-  const { drafts, removePostDraftById } = useDraftStore();
-  const draftIdx = useMemo(() => drafts.findIndex((draft) => draft.id === draftId), [draftId, drafts]);
-  const draft = draftIdx !== undefined ? drafts[draftIdx] : undefined;
+  const { castModalView } = useNavigationStore()
+  const { selectedCast } = useDataStore()
+  const { drafts, removePostDraftById } = useDraftStore()
+  const draftIdx = useMemo(() => drafts.findIndex((draft) => draft.id === draftId), [draftId, drafts])
+  const draft = draftIdx !== undefined ? drafts[draftIdx] : undefined
 
   useEffect(() => {
     if (!open && draftId !== undefined) {
-      removePostDraftById(draftId);
+      removePostDraftById(draftId)
     }
-  }, [open, draftId]);
+  }, [open, draftId])
   useHotkeys('esc', () => setOpen(false), [open], {
     enableOnFormTags: true,
     enableOnContentEditable: true,
     enabled: open,
-  });
+  })
 
   const getTitle = () => {
-    let action = 'New post';
-    const username = `@${selectedCast?.author.username}`;
+    let action = 'New post'
+    const username = `@${selectedCast?.author.username}`
     if (castModalView === CastModalView.Reply) {
-      action = `Reply to ${username}`;
+      action = `Reply to ${username}`
     } else if (castModalView === CastModalView.Quote) {
-      action = `Quote ${username}`;
+      action = `Quote ${username}`
     }
     return (
       <span className="flex items-center">
@@ -50,8 +50,8 @@ const NewCastModal: React.FC<NewCastModalProps> = ({ draftId, open, setOpen }) =
           accountFilter={(account) => account.status === AccountStatusType.active}
         />
       </span>
-    );
-  };
+    )
+  }
 
   return (
     <Modal title={getTitle()} open={open} setOpen={setOpen} focusMode={false}>
@@ -71,7 +71,7 @@ const NewCastModal: React.FC<NewCastModalProps> = ({ draftId, open, setOpen }) =
                 draft={draft}
                 draftIdx={draftIdx}
                 onPost={() => {
-                  setOpen(false);
+                  setOpen(false)
                 }}
                 hideChannel={castModalView === CastModalView.Reply}
               />
@@ -80,7 +80,7 @@ const NewCastModal: React.FC<NewCastModalProps> = ({ draftId, open, setOpen }) =
         )}
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default NewCastModal;
+export default NewCastModal

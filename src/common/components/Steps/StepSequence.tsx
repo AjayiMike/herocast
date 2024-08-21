@@ -1,18 +1,18 @@
-import React, { ReactNode } from 'react';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { SidebarNav, SidebarNavItem } from './SidebarNav';
-import findIndex from 'lodash.findindex';
-import includes from 'lodash.includes';
+import React, { ReactNode } from 'react'
+import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
+import { SidebarNav, SidebarNavItem } from './SidebarNav'
+import findIndex from 'lodash.findindex'
+import includes from 'lodash.includes'
 
 type StepSequenceProps = {
-  title: string;
-  description: string;
-  navItems: SidebarNavItem[];
-  step: string;
-  setStep: (string) => void;
-  renderStep: (string) => ReactNode;
-};
+  title: string
+  description: string
+  navItems: SidebarNavItem[]
+  step: string
+  setStep: (string) => void
+  renderStep: (string) => ReactNode
+}
 
 const StepSequence = ({ title, description, navItems, step, setStep, renderStep }: StepSequenceProps) => {
   const progressPercent =
@@ -20,7 +20,7 @@ const StepSequence = ({ title, description, navItems, step, setStep, renderStep 
       'keys' in item ? includes(item.keys, step) : 'key' in item ? item.key === step : false
     ) /
       (navItems.length - 1)) *
-    100;
+    100
 
   return (
     <div className="w-full">
@@ -42,7 +42,7 @@ const StepSequence = ({ title, description, navItems, step, setStep, renderStep 
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default StepSequence;
+export default StepSequence

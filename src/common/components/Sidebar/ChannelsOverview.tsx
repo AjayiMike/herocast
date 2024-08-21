@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { ChannelType } from '@/common/constants/channels';
-import { CUSTOM_CHANNELS, useAccountStore } from '@/stores/useAccountStore';
-import { SidebarHeader } from './SidebarHeader';
-import { cn } from '@/lib/utils';
-import { ArrowTrendingUpIcon, HomeIcon } from '@heroicons/react/20/solid';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useListStore } from '@/stores/useListStore';
+import React, { useState } from 'react'
+import { ChannelType } from '@/common/constants/channels'
+import { CUSTOM_CHANNELS, useAccountStore } from '@/stores/useAccountStore'
+import { SidebarHeader } from './SidebarHeader'
+import { cn } from '@/lib/utils'
+import { ArrowTrendingUpIcon, HomeIcon } from '@heroicons/react/20/solid'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { useListStore } from '@/stores/useListStore'
 
 const ChannelsOverview = () => {
-  const { selectedChannelUrl, setSelectedChannelUrl, resetSelectedChannel } = useAccountStore();
+  const { selectedChannelUrl, setSelectedChannelUrl, resetSelectedChannel } = useAccountStore()
 
-  const { setSelectedListId } = useListStore();
+  const { setSelectedListId } = useListStore()
 
-  let channels: ChannelType[] = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels);
-  const [isShowAllChannels, setIsShowAllChannels] = useState(false);
-  if (!channels) channels = [];
+  let channels: ChannelType[] = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels)
+  const [isShowAllChannels, setIsShowAllChannels] = useState(false)
+  if (!channels) channels = []
 
   const onUpdateChannel = (url: string) => {
-    setSelectedChannelUrl(url);
-    setSelectedListId(undefined);
-  };
+    setSelectedChannelUrl(url)
+    setSelectedListId(undefined)
+  }
 
   const renderCustomChannel = ({ name, url, icon }: { name: string; url: string; icon?: React.ReactNode }) => {
     return (
@@ -39,8 +39,8 @@ const ChannelsOverview = () => {
           </span>
         </div>
       </li>
-    );
-  };
+    )
+  }
 
   const renderFeedHeader = (title: string, button?) => {
     return (
@@ -48,8 +48,8 @@ const ChannelsOverview = () => {
         <h3 className="mr-2 text-md font-semibold leading-7 tracking-tight text-primary">{title}</h3>
         {button}
       </div>
-    );
-  };
+    )
+  }
 
   const renderChannel = (channel: ChannelType) => (
     <div
@@ -75,7 +75,7 @@ const ChannelsOverview = () => {
         <span className="flex-nowrap truncate">{channel.name}</span>
       </div>
     </div>
-  );
+  )
 
   const renderChannelList = () => (
     <div className="flex flex-col">
@@ -99,7 +99,7 @@ const ChannelsOverview = () => {
         </Collapsible>
       </ul>
     </div>
-  );
+  )
 
   const renderAddFirstChannelsButton = () => (
     <Link href="/channels" className="px-4 py-3 sm:px-4 sm:py-3">
@@ -107,9 +107,9 @@ const ChannelsOverview = () => {
         Pin your channels
       </Button>
     </Link>
-  );
+  )
 
-  const hasChannels = channels.length > 0;
+  const hasChannels = channels.length > 0
 
   return (
     <div className="mb-4">
@@ -140,7 +140,7 @@ const ChannelsOverview = () => {
       )}
       {hasChannels ? renderChannelList() : renderAddFirstChannelsButton()}
     </div>
-  );
-};
+  )
+}
 
-export default ChannelsOverview;
+export default ChannelsOverview

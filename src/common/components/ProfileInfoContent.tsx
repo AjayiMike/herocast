@@ -1,21 +1,21 @@
-import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loading } from './Loading';
-import { formatLargeNumber } from '../helpers/text';
-import FollowButton from './FollowButton';
+import React from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Loading } from './Loading'
+import { formatLargeNumber } from '../helpers/text'
+import FollowButton from './FollowButton'
 
 type ProfileInfoContentProps = {
-  profile: any;
-  showFollowButton?: boolean;
-  isHoverCard?: boolean;
-};
+  profile: any
+  showFollowButton?: boolean
+  isHoverCard?: boolean
+}
 
 const ProfileInfoContent: React.FC<ProfileInfoContentProps> = ({
   profile,
   showFollowButton = true,
   isHoverCard = false,
 }) => {
-  if (!profile) return <Loading />;
+  if (!profile) return <Loading />
 
   return (
     <div className="space-y-2">
@@ -52,7 +52,7 @@ const ProfileInfoContent: React.FC<ProfileInfoContentProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProfileInfoContent;
+export default ProfileInfoContent

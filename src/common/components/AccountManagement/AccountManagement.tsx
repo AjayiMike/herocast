@@ -1,15 +1,15 @@
-import React from 'react';
-import { AccountObjectType } from '@/stores/useAccountStore';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import RenameAccountForm from './RenameAccountForm';
-import ChangeBioForm from './ChangeBioForm';
-import ChangeDisplayNameForm from './ChangeDisplayNameForm';
-import ChangeProfilePictureForm from './ChangeProfilePictureForm';
+import React from 'react'
+import { AccountObjectType } from '@/stores/useAccountStore'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import RenameAccountForm from './RenameAccountForm'
+import ChangeBioForm from './ChangeBioForm'
+import ChangeDisplayNameForm from './ChangeDisplayNameForm'
+import ChangeProfilePictureForm from './ChangeProfilePictureForm'
 
 type AccountManagementProps = {
-  account: AccountObjectType;
-  onSuccess?: () => void;
-};
+  account: AccountObjectType
+  onSuccess?: () => void
+}
 
 enum AccountManagementTab {
   NAME = 'NAME',
@@ -35,7 +35,7 @@ const AccountManagementTabs = [
     key: AccountManagementTab.NAME,
     label: 'Name',
   },
-];
+]
 
 const AccountManagement = ({ account, onSuccess }: AccountManagementProps) => {
   const renderChangeNameTab = () => {
@@ -43,26 +43,26 @@ const AccountManagement = ({ account, onSuccess }: AccountManagementProps) => {
       <TabsContent value={AccountManagementTab.NAME}>
         <RenameAccountForm account={account} />
       </TabsContent>
-    );
-  };
+    )
+  }
 
   const renderChangeProfilePictureTab = () => (
     <TabsContent value={AccountManagementTab.PROFILE_PICTURE}>
       <ChangeProfilePictureForm account={account} onSuccess={onSuccess} />
     </TabsContent>
-  );
+  )
 
   const renderChangeBioTab = () => (
     <TabsContent value={AccountManagementTab.BIO}>
       <ChangeBioForm account={account} onSuccess={onSuccess} />
     </TabsContent>
-  );
+  )
 
   const renderChangeDisplayNameTab = () => (
     <TabsContent value={AccountManagementTab.DISPLAY_NAME}>
       <ChangeDisplayNameForm account={account} onSuccess={onSuccess} />
     </TabsContent>
-  );
+  )
 
   return (
     <div>
@@ -80,6 +80,6 @@ const AccountManagement = ({ account, onSuccess }: AccountManagementProps) => {
         {renderChangeBioTab()}
       </Tabs>
     </div>
-  );
-};
-export default AccountManagement;
+  )
+}
+export default AccountManagement

@@ -1,80 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { openWindow } from '../helpers/navigation';
-import { Loading } from './Loading';
-import { useInView } from 'react-intersection-observer';
-import { DexPair, PriceChange, useDataStore } from '@/stores/useDataStore';
-import get from 'lodash.get';
-import { Button } from '@/components/ui/button';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import React, { useEffect, useState } from 'react'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { openWindow } from '../helpers/navigation'
+import { Loading } from './Loading'
+import { useInView } from 'react-intersection-observer'
+import { DexPair, PriceChange, useDataStore } from '@/stores/useDataStore'
+import get from 'lodash.get'
+import { Button } from '@/components/ui/button'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 
 type CashtagHoverCardProps = {
-  tokenSymbol: string;
-  userFid: string | number;
-  children: React.ReactNode;
-};
+  tokenSymbol: string
+  userFid: string | number
+  children: React.ReactNode
+}
 
-const DEX_SCREENER_API_ENDPOINT = 'https://api.dexscreener.com/latest/dex/search/?q=';
+const DEX_SCREENER_API_ENDPOINT = 'https://api.dexscreener.com/latest/dex/search/?q='
 
 const CashtagHoverCard = ({
   userFid,
   tokenSymbol, // must be uppercause, because is used as key in data store and for lookup
   children,
 }: CashtagHoverCardProps) => {
-  const { addTokenData } = useDataStore();
-  const tokenData = useDataStore((state) => get(state.tokenSymbolToData, tokenSymbol));
+  const { addTokenData } = useDataStore()
+  const tokenData = useDataStore((state) => get(state.tokenSymbolToData, tokenSymbol))
   const { ref, inView } = useInView({
     threshold: 0,
     delay: 0,
-  });
+  })
 
   useEffect(() => {
-    if (!inView || tokenData) return;
+    if (!inView || tokenData) return
 
     const getData = async () => {
       try {
-        const apiEndpoint = `${DEX_SCREENER_API_ENDPOINT}${tokenSymbol}`;
-        const resp = await fetch(apiEndpoint);
-        const data = await resp.json();
+        const apiEndpoint = `${DEX_SCREENER_API_ENDPOINT}${tokenSymbol}`
+        const resp = await fetch(apiEndpoint)
+        const data = await resp.json()
         if (!data.pairs) {
-          return;
+          return
         }
 
-        const tradingPairs = data.pairs.filter((pair) => pair.baseToken.symbol === tokenSymbol);
+        const tradingPairs = data.pairs.filter((pair) => pair.baseToken.symbol === tokenSymbol)
         if (!tradingPairs.length) {
-          return;
+          return
         }
 
-        const pairsSortedByLiquidity = tradingPairs.sort((a, b) => b.liquidity?.usd - a.liquidity?.usd);
-        const mostLiquidityPair: DexPair = pairsSortedByLiquidity[0];
+        const pairsSortedByLiquidity = tradingPairs.sort((a, b) => b.liquidity?.usd - a.liquidity?.usd)
+        const mostLiquidityPair: DexPair = pairsSortedByLiquidity[0]
 
         if (mostLiquidityPair) {
-          addTokenData({ tokenSymbol, data: mostLiquidityPair });
+          addTokenData({ tokenSymbol, data: mostLiquidityPair })
         }
       } catch (err) {
-        console.log('CashtagHoverCard: err getting data', err);
+        console.log('CashtagHoverCard: err getting data', err)
       }
-    };
+    }
 
-    getData();
-  }, [inView, tokenData, userFid]);
+    getData()
+  }, [inView, tokenData, userFid])
 
   const onClick = () => {
-    if (!tokenData) return;
+    if (!tokenData) return
 
-    openWindow(tokenData.url);
-  };
+    openWindow(tokenData.url)
+  }
 
   const renderPriceChangeRow = (label: string, value: string) => {
-    const color = value.startsWith('-') ? 'text-red-500' : 'text-green-500';
+    const color = value.startsWith('-') ? 'text-red-500' : 'text-green-500'
     return (
       <div className="mx-auto flex max-w-xs flex-col items-center justify-between">
         <span className="text-sm text-gray-600">{label}</span>
         <span className={`text-sm font-semibold tracking-tight ${color}`}>{value}</span>
       </div>
-    );
-  };
+    )
+  }
   const renderPriceChanges = (priceChange: PriceChange) => {
     return (
       <dl className="grid grid-cols-3 gap-x-2 gap-y-2 text-center">
@@ -82,8 +82,8 @@ const CashtagHoverCard = ({
         {renderPriceChangeRow('1H', `${priceChange.h1}%`)}
         {renderPriceChangeRow('24H', `${priceChange.h24}%`)}
       </dl>
-    );
-  };
+    )
+  }
 
   return (
     <HoverCard openDelay={0.1}>
@@ -118,7 +118,7 @@ const CashtagHoverCard = ({
         </div>
       </HoverCardContent>
     </HoverCard>
-  );
-};
+  )
+}
 
-export default CashtagHoverCard;
+export default CashtagHoverCard

@@ -230,4 +230,4 @@ export const HatsModuleFactoryAbi = [
       },
     ],
   },
-] as const;
+] as const

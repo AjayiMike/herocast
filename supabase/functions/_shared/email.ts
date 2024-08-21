@@ -1,5 +1,5 @@
-import React from 'https://esm.sh/react';
-import { render } from 'https://esm.sh/@react-email/render';
+import React from 'https://esm.sh/react'
+import { render } from 'https://esm.sh/@react-email/render'
 import {
   Button,
   Html,
@@ -11,46 +11,46 @@ import {
   Text,
   Tailwind,
   Img,
-} from 'https://esm.sh/@react-email/components';
+} from 'https://esm.sh/@react-email/components'
 
 interface Cast {
   author: {
-    pfp_url?: string;
-    pfp?: { url: string };
-    display_name?: string;
-    displayName?: string;
-    username: string;
-  };
-  text: string;
-  embeds?: { url: string }[];
+    pfp_url?: string
+    pfp?: { url: string }
+    display_name?: string
+    displayName?: string
+    username: string
+  }
+  text: string
+  embeds?: { url: string }[]
   reactions?: {
-    likes_count?: number;
-    recasts_count?: number;
-  };
+    likes_count?: number
+    recasts_count?: number
+  }
   replies?: {
-    count?: number;
-  };
-  hash: string;
+    count?: number
+  }
+  hash: string
 }
 
 interface CastRowProps {
-  cast: Cast;
-  searchTerm: string;
+  cast: Cast
+  searchTerm: string
 }
 
 interface ListWithCasts {
-  listName: string;
-  searchTerm: string;
-  casts: Cast[];
+  listName: string
+  searchTerm: string
+  casts: Cast[]
 }
 
 interface EmailProps {
-  listsWithCasts: ListWithCasts[];
+  listsWithCasts: ListWithCasts[]
 }
 
 const CastRow: React.FC<CastRowProps> = ({ cast, searchTerm }) => {
-  const pfpUrl = cast.author.pfp_url || cast.author.pfp?.url;
-  const displayName = cast.author.display_name || cast.author.displayName;
+  const pfpUrl = cast.author.pfp_url || cast.author.pfp?.url
+  const displayName = cast.author.display_name || cast.author.displayName
 
   const renderCastRow = () => {
     return React.createElement(
@@ -99,27 +99,27 @@ const CastRow: React.FC<CastRowProps> = ({ cast, searchTerm }) => {
         },
         'View on herocast'
       )
-    );
-  };
+    )
+  }
 
   try {
-    return renderCastRow();
+    return renderCastRow()
   } catch (error) {
-    console.error('Error rendering cast row:', error, cast);
-    return null;
+    console.error('Error rendering cast row:', error, cast)
+    return null
   }
-};
+}
 
-const MAX_CASTS_PER_LIST = 5;
-const MAX_LISTS_PER_EMAIL = 10;
+const MAX_CASTS_PER_LIST = 5
+const MAX_LISTS_PER_EMAIL = 10
 
 const Email: React.FC<EmailProps> = ({ listsWithCasts }) => {
-  const truncatedLists = listsWithCasts.slice(0, MAX_LISTS_PER_EMAIL);
-  const isListsTruncated = listsWithCasts.length > MAX_LISTS_PER_EMAIL;
+  const truncatedLists = listsWithCasts.slice(0, MAX_LISTS_PER_EMAIL)
+  const isListsTruncated = listsWithCasts.length > MAX_LISTS_PER_EMAIL
 
   const renderListWithCasts = (listName: string, searchTerm: string, casts: Cast[]) => {
-    const truncatedCasts = casts.slice(0, MAX_CASTS_PER_LIST);
-    const isCastsTruncated = casts.length > MAX_CASTS_PER_LIST;
+    const truncatedCasts = casts.slice(0, MAX_CASTS_PER_LIST)
+    const isCastsTruncated = casts.length > MAX_CASTS_PER_LIST
 
     try {
       return React.createElement(
@@ -133,12 +133,12 @@ const Email: React.FC<EmailProps> = ({ listsWithCasts }) => {
                 React.createElement(Text, { className: 'text-sm italic text-gray-500 mt-2' }, `and more casts...`),
             ]
           : React.createElement(Text, { className: 'text-sm italic text-gray-500' }, 'No new casts in this list today.')
-      );
+      )
     } catch (error) {
-      console.error('Error rendering list with casts:', error, listName, casts);
-      return null;
+      console.error('Error rendering list with casts:', error, listName, casts)
+      return null
     }
-  };
+  }
 
   return React.createElement(
     Html,
@@ -169,7 +169,7 @@ const Email: React.FC<EmailProps> = ({ listsWithCasts }) => {
         )
       )
     )
-  );
-};
+  )
+}
 
-export const getHtmlEmail = (props: EmailProps): string => render(React.createElement(Email, props));
+export const getHtmlEmail = (props: EmailProps): string => render(React.createElement(Email, props))

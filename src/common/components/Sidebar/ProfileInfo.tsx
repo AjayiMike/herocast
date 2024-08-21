@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { fetchAndAddUserProfile, shouldUpdateProfile } from '../../helpers/profileUtils';
-import { useDataStore } from '@/stores/useDataStore';
-import get from 'lodash.get';
-import Link from 'next/link';
-import ProfileInfoContent from '../ProfileInfoContent';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
-import { take } from 'lodash';
-import { formatDistanceToNow } from 'date-fns';
+import React, { useEffect } from 'react'
+import { fetchAndAddUserProfile, shouldUpdateProfile } from '../../helpers/profileUtils'
+import { useDataStore } from '@/stores/useDataStore'
+import get from 'lodash.get'
+import Link from 'next/link'
+import ProfileInfoContent from '../ProfileInfoContent'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Badge } from '@/components/ui/badge'
+import { take } from 'lodash'
+import { formatDistanceToNow } from 'date-fns'
 
-const priorityChannels = ['email', 'linkedin', 'telegram', 'twitter', 'github'];
+const priorityChannels = ['email', 'linkedin', 'telegram', 'twitter', 'github']
 
 const ProfileInfo = ({
   fid,
@@ -17,21 +17,21 @@ const ProfileInfo = ({
   showFollowButton,
   showFullInfo,
 }: {
-  fid: number;
-  viewerFid: number;
-  showFollowButton?: boolean;
-  showFullInfo?: boolean;
+  fid: number
+  viewerFid: number
+  showFollowButton?: boolean
+  showFullInfo?: boolean
 }) => {
-  const profile = useDataStore((state) => get(state.fidToData, fid));
+  const profile = useDataStore((state) => get(state.fidToData, fid))
 
   useEffect(() => {
     if (shouldUpdateProfile(profile)) {
-      fetchAndAddUserProfile({ fid, viewerFid });
+      fetchAndAddUserProfile({ fid, viewerFid })
     }
-  }, [fid, viewerFid, profile]);
+  }, [fid, viewerFid, profile])
 
   const renderDateJoined = () => {
-    if (!profile?.airstackSocialInfo?.userCreatedAt) return null;
+    if (!profile?.airstackSocialInfo?.userCreatedAt) return null
     return (
       <p className="text-sm text-muted-foreground">
         <span className="font-semibold text-foreground">
@@ -39,8 +39,8 @@ const ProfileInfo = ({
         </span>{' '}
         account age
       </p>
-    );
-  };
+    )
+  }
   const renderSocialCapitalScore = () =>
     profile?.airstackSocialInfo?.socialCapitalRank && (
       <TooltipProvider>
@@ -69,12 +69,12 @@ const ProfileInfo = ({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-    );
+    )
 
-  const shouldRenderFullInfo = showFullInfo && (profile?.airstackSocialInfo || profile?.icebreakerSocialInfo);
+  const shouldRenderFullInfo = showFullInfo && (profile?.airstackSocialInfo || profile?.icebreakerSocialInfo)
 
   const renderIcebreakerCredentials = () => {
-    if (!profile?.icebreakerSocialInfo?.credentials?.length) return null;
+    if (!profile?.icebreakerSocialInfo?.credentials?.length) return null
 
     return (
       <div className="mt-2">
@@ -90,19 +90,19 @@ const ProfileInfo = ({
           ))}
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderIcebreakerChannels = () => {
-    if (!profile?.icebreakerSocialInfo?.channels?.length) return null;
+    if (!profile?.icebreakerSocialInfo?.channels?.length) return null
 
     const filteredChannels = profile.icebreakerSocialInfo.channels.filter(
       (channel) => channel.value && priorityChannels.includes(channel.type)
-    );
+    )
 
     const sortedChannels = filteredChannels.sort(
       (a, b) => priorityChannels.indexOf(a.type) - priorityChannels.indexOf(b.type)
-    );
+    )
 
     return (
       <div className="mt-2">
@@ -116,8 +116,8 @@ const ProfileInfo = ({
           ))}
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="space-y-2 mb-4 min-h-72 w-full">
@@ -142,7 +142,7 @@ const ProfileInfo = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ProfileInfo;
+export default ProfileInfo

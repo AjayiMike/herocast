@@ -1,27 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from 'react';
-import { PhotoIcon } from '@heroicons/react/24/solid';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Label } from '@/components/ui/label';
+import React, { useState } from 'react'
+import { PhotoIcon } from '@heroicons/react/24/solid'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Label } from '@/components/ui/label'
 
 const getImageViaCdnUrl = (imgUrl: string, skipCdn: boolean) => {
-  if (imgUrl.startsWith('https://imagedelivery.net')) return imgUrl;
+  if (imgUrl.startsWith('https://imagedelivery.net')) return imgUrl
 
   if (!skipCdn && imgUrl.includes('imgur.com')) {
-    const fileSuffix = imgUrl.split('.').slice(-1)[0];
-    return `https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_${fileSuffix}/${imgUrl}`;
+    const fileSuffix = imgUrl.split('.').slice(-1)[0]
+    return `https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_${fileSuffix}/${imgUrl}`
   }
-  return imgUrl;
-};
+  return imgUrl
+}
 
 export const WarpcastImage = ({ url }: { url: string }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [skipCdn, setSkipCdn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
+  const [skipCdn, setSkipCdn] = useState(false)
 
   const onImageLoad = (e: any) => {
-    setIsLoading(false);
-    e.currentTarget.style.display = 'block';
-  };
+    setIsLoading(false)
+    e.currentTarget.style.display = 'block'
+  }
 
   const renderLoadingPlaceholder = () => {
     return (
@@ -29,8 +29,8 @@ export const WarpcastImage = ({ url }: { url: string }) => {
         <PhotoIcon className="mx-auto h-12 w-12 text-foreground/70" />
         <Label>Loading image...</Label>
       </Skeleton>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -41,14 +41,14 @@ export const WarpcastImage = ({ url }: { url: string }) => {
         alt=""
         referrerPolicy="no-referrer"
         onError={(e) => {
-          if (skipCdn) return;
+          if (skipCdn) return
 
-          console.log('error loading image, retry without CDN', url);
-          setSkipCdn(true);
+          console.log('error loading image, retry without CDN', url)
+          setSkipCdn(true)
         }}
         onLoad={(e) => onImageLoad(e)}
       />
       {isLoading && renderLoadingPlaceholder()}
     </>
-  );
-};
+  )
+}

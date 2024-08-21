@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { SelectableListWithHotkeys } from '@/common/components/SelectableListWithHotkeys';
-import { CastRow } from '@/common/components/CastRow';
-import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster/models/cast-with-interactions';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAccountStore } from '@/stores/useAccountStore';
-import { useDataStore } from '@/stores/useDataStore';
-import { fetchAndAddUserProfile, getProfile, shouldUpdateProfile } from '@/common/helpers/profileUtils';
-import { useRouter } from 'next/router';
-import { Loading } from '@/common/components/Loading';
-import ProfileInfo from '@/common/components/Sidebar/ProfileInfo';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { SelectableListWithHotkeys } from '@/common/components/SelectableListWithHotkeys'
+import { CastRow } from '@/common/components/CastRow'
+import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster/models/cast-with-interactions'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useAccountStore } from '@/stores/useAccountStore'
+import { useDataStore } from '@/stores/useDataStore'
+import { fetchAndAddUserProfile, getProfile, shouldUpdateProfile } from '@/common/helpers/profileUtils'
+import { useRouter } from 'next/router'
+import { Loading } from '@/common/components/Loading'
+import ProfileInfo from '@/common/components/Sidebar/ProfileInfo'
 
-const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!);
+const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!)
 
 enum FeedTypeEnum {
   'casts' = 'Casts',
@@ -21,45 +21,45 @@ enum FeedTypeEnum {
 
 const getUsernameAndFidFromSlug = (slug?: string) => {
   if (!slug) {
-    return { username: undefined, fid: undefined };
+    return { username: undefined, fid: undefined }
   }
-  const fid = slug.startsWith('fid:') ? slug.slice(4) : undefined;
+  const fid = slug.startsWith('fid:') ? slug.slice(4) : undefined
   if (fid) {
-    return { username: undefined, fid };
+    return { username: undefined, fid }
   }
-  const username = slug.startsWith('@') ? slug.slice(1) : slug;
-  return { username, fid };
-};
+  const username = slug.startsWith('@') ? slug.slice(1) : slug
+  return { username, fid }
+}
 
 const ProfilePage = () => {
-  const router = useRouter();
-  const { slug } = router.query as { slug?: string };
-  const { username, fid } = getUsernameAndFidFromSlug(slug);
-  const [selectedFeedIdx, setSelectedFeedIdx] = useState(0);
-  const [casts, setCasts] = useState<CastWithInteractions[]>([]);
-  const [feedType, setFeedType] = useState<FeedTypeEnum>(FeedTypeEnum.casts);
+  const router = useRouter()
+  const { slug } = router.query as { slug?: string }
+  const { username, fid } = getUsernameAndFidFromSlug(slug)
+  const [selectedFeedIdx, setSelectedFeedIdx] = useState(0)
+  const [casts, setCasts] = useState<CastWithInteractions[]>([])
+  const [feedType, setFeedType] = useState<FeedTypeEnum>(FeedTypeEnum.casts)
 
-  const profile = useDataStore((state) => getProfile(state, username, fid));
-  const { accounts, selectedAccountIdx } = useAccountStore();
+  const profile = useDataStore((state) => getProfile(state, username, fid))
+  const { accounts, selectedAccountIdx } = useAccountStore()
 
-  const selectedAccount = accounts[selectedAccountIdx];
-  const viewerFid = Number(selectedAccount?.platformAccountId) || APP_FID;
+  const selectedAccount = accounts[selectedAccountIdx]
+  const viewerFid = Number(selectedAccount?.platformAccountId) || APP_FID
 
   const onSelectCast = (idx: number) => {
-    setSelectedFeedIdx(idx);
-  };
+    setSelectedFeedIdx(idx)
+  }
 
   useEffect(() => {
     if (shouldUpdateProfile(profile)) {
-      fetchAndAddUserProfile({ username, fid, viewerFid });
+      fetchAndAddUserProfile({ username, fid, viewerFid })
     }
-  }, [profile, fid, slug]);
+  }, [profile, fid, slug])
 
   useEffect(() => {
-    if (!profile) return;
+    if (!profile) return
 
     const loadFeed = async () => {
-      const client = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+      const client = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
 
       if (feedType === FeedTypeEnum.casts) {
         client
@@ -70,22 +70,22 @@ const ProfilePage = () => {
             limit: 25,
           })
           .then(({ casts }) => {
-            setCasts(casts);
+            setCasts(casts)
           })
-          .catch((err) => console.log(`failed to fetch ${err}`));
+          .catch((err) => console.log(`failed to fetch ${err}`))
       } else if (feedType === FeedTypeEnum.likes) {
         client
           .fetchUserReactions(profile.fid, 'likes', {
             limit: 25,
           })
           .then(({ reactions }) => {
-            setCasts(reactions.map(({ cast }) => cast));
-          });
+            setCasts(reactions.map(({ cast }) => cast))
+          })
       }
-    };
+    }
 
-    loadFeed();
-  }, [profile, feedType]);
+    loadFeed()
+  }, [profile, feedType])
 
   const renderEmptyState = () => (
     <div className="max-w-7xl px-6 pb-24 sm:pb-32 lg:flex lg:px-8">
@@ -93,7 +93,7 @@ const ProfilePage = () => {
         <Loading />
       </div>
     </div>
-  );
+  )
 
   const renderRow = (item: CastWithInteractions, idx: number) => (
     <li
@@ -108,7 +108,7 @@ const ProfilePage = () => {
         showAdminActions={selectedAccount?.status === 'active' && profile?.fid === viewerFid}
       />
     </li>
-  );
+  )
 
   const renderFeed = () => (
     <>
@@ -124,7 +124,7 @@ const ProfilePage = () => {
               >
                 {FeedTypeEnum[key]}
               </TabsTrigger>
-            );
+            )
           })}
         </TabsList>
       </Tabs>
@@ -140,7 +140,7 @@ const ProfilePage = () => {
         />
       </div>
     </>
-  );
+  )
 
   const renderProfile = () => (
     <div>
@@ -149,9 +149,9 @@ const ProfilePage = () => {
       </div>
       {renderFeed()}
     </div>
-  );
+  )
 
-  return router.isFallback || !profile ? renderEmptyState() : renderProfile();
-};
+  return router.isFallback || !profile ? renderEmptyState() : renderProfile()
+}
 
-export default ProfilePage;
+export default ProfilePage

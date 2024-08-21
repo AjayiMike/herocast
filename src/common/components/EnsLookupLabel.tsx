@@ -1,38 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
-import { isAddress } from 'viem';
-import { getAddressFromEnsName } from '../helpers/ens';
-import { getEnsNameForAddress } from '../helpers/ens';
-import { useAccount } from 'wagmi';
+import React, { useEffect, useState } from 'react'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid'
+import { isAddress } from 'viem'
+import { getAddressFromEnsName } from '../helpers/ens'
+import { getEnsNameForAddress } from '../helpers/ens'
+import { useAccount } from 'wagmi'
 
 const EnsLookupLabel = ({ addressOrName }: { addressOrName: string }) => {
-  const [ensName, setEnsName] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
-  const { isConnected } = useAccount();
+  const [ensName, setEnsName] = useState<string | null>(null)
+  const [address, setAddress] = useState<string | null>(null)
+  const { isConnected } = useAccount()
 
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected) return
 
     if (addressOrName && addressOrName.endsWith('.eth')) {
       getAddressFromEnsName(addressOrName).then((ensAddress) => {
-        setAddress(ensAddress);
-      });
-      return;
+        setAddress(ensAddress)
+      })
+      return
     }
 
     if (isAddress(addressOrName)) {
       getEnsNameForAddress(addressOrName).then((ensName) => {
-        setEnsName(ensName);
-      });
+        setEnsName(ensName)
+      })
     }
 
     return () => {
-      setEnsName(null);
-      setAddress(null);
-    };
-  }, [addressOrName, isConnected]);
+      setEnsName(null)
+      setAddress(null)
+    }
+  }, [addressOrName, isConnected])
 
-  if (!addressOrName) return null;
+  if (!addressOrName) return null
 
   return (
     (ensName || address) && (
@@ -45,7 +45,7 @@ const EnsLookupLabel = ({ addressOrName }: { addressOrName: string }) => {
         {ensName || address} <ArrowTopRightOnSquareIcon className="ml-1 mt-0.5 h-4 w-4" />
       </a>
     )
-  );
-};
+  )
+}
 
-export default EnsLookupLabel;
+export default EnsLookupLabel

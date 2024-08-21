@@ -1,30 +1,30 @@
-import React, { useRef } from 'react';
-import { Progress } from '@/components/ui/progress';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { useImgurUpload } from '@/common/hooks/useImgurUpload';
+import React, { useRef } from 'react'
+import { Progress } from '@/components/ui/progress'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { useImgurUpload } from '@/common/hooks/useImgurUpload'
 
 type ImgurUploadProps = {
-  onSuccess?: (string) => void;
-};
+  onSuccess?: (string) => void
+}
 
 const ImgurUpload = ({ onSuccess }: ImgurUploadProps) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadImage, isUploading, error, uploadProgress, image } = useImgurUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { uploadImage, isUploading, error, uploadProgress, image } = useImgurUpload()
 
   const handleUpload = async (e: React.FormEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const file = e.currentTarget.files?.[0];
+    e.preventDefault()
+    const file = e.currentTarget.files?.[0]
     if (file) {
-      await uploadImage(file);
+      await uploadImage(file)
     }
-  };
+  }
 
   React.useEffect(() => {
     if (image?.link) {
-      onSuccess?.(image.link);
+      onSuccess?.(image.link)
     }
-  }, [image, onSuccess]);
+  }, [image, onSuccess])
 
   return (
     <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -46,7 +46,7 @@ const ImgurUpload = ({ onSuccess }: ImgurUploadProps) => {
       )}
       {error && <Label className="text-red-500">{error}</Label>}
     </div>
-  );
-};
+  )
+}
 
-export default ImgurUpload;
+export default ImgurUpload

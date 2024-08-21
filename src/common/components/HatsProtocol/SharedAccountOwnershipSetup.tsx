@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import BigOptionSelector from '@/common/components/BigOptionSelector';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { isAddress } from 'viem';
-import DeployHatsDelegatorContract from '../DeployHatsDelegatorContract';
-import { WarpcastImage } from '../PostEmbeddedContent/WarpcastImage';
+import React, { useEffect, useState } from 'react'
+import BigOptionSelector from '@/common/components/BigOptionSelector'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { isAddress } from 'viem'
+import DeployHatsDelegatorContract from '../DeployHatsDelegatorContract'
+import { WarpcastImage } from '../PostEmbeddedContent/WarpcastImage'
 
 export enum OwnershipSetupSteps {
   unknown = 'UNKNOWN',
@@ -13,13 +13,13 @@ export enum OwnershipSetupSteps {
 }
 
 type SharedAccountOwnershipSetupProps = {
-  onSuccess: () => void;
-  delegatorContractAddress: `0x${string}`;
-  setDelegatorContractAddress: (address: string) => void;
-  defaultStep?: OwnershipSetupSteps;
-  adminHatId?: bigint;
-  casterHatId?: bigint;
-};
+  onSuccess: () => void
+  delegatorContractAddress: `0x${string}`
+  setDelegatorContractAddress: (address: string) => void
+  defaultStep?: OwnershipSetupSteps
+  adminHatId?: bigint
+  casterHatId?: bigint
+}
 
 export const SharedAccountOwnershipSetup = ({
   onSuccess,
@@ -29,26 +29,26 @@ export const SharedAccountOwnershipSetup = ({
   adminHatId,
   casterHatId,
 }: SharedAccountOwnershipSetupProps) => {
-  const [state, setState] = useState<OwnershipSetupSteps>(defaultStep || OwnershipSetupSteps.unknown);
+  const [state, setState] = useState<OwnershipSetupSteps>(defaultStep || OwnershipSetupSteps.unknown)
 
   useEffect(() => {
     if (defaultStep && defaultStep !== state) {
-      setState(defaultStep);
+      setState(defaultStep)
     }
-  }, [defaultStep]);
+  }, [defaultStep])
 
   const renderStep = () => {
     switch (state) {
       case OwnershipSetupSteps.unknown:
-        return renderUnknownStep();
+        return renderUnknownStep()
       case OwnershipSetupSteps.new_tree:
-        return renderUnpreparedStep();
+        return renderUnpreparedStep()
       case OwnershipSetupSteps.existing_tree:
-        return renderExistingTreeStep();
+        return renderExistingTreeStep()
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   const renderUnpreparedStep = () => (
     <div>
@@ -59,7 +59,7 @@ export const SharedAccountOwnershipSetup = ({
       </a>{' '}
       to create a tree.
     </div>
-  );
+  )
 
   const renderExistingTreeStep = () => (
     <div className="flex flex-col space-x-2 lg:flex-row lg:space-x-8">
@@ -87,14 +87,14 @@ export const SharedAccountOwnershipSetup = ({
         <WarpcastImage url="https://i.imgur.com/pgl0n75.gif" />
       </div>
     </div>
-  );
+  )
 
   const renderGoBack = () =>
     state !== OwnershipSetupSteps.unknown && (
       <Button className="mt-8" variant="default" onClick={() => setState(OwnershipSetupSteps.unknown)}>
         Go back
       </Button>
-    );
+    )
 
   const renderUnknownStep = () => (
     <BigOptionSelector
@@ -127,14 +127,14 @@ export const SharedAccountOwnershipSetup = ({
         },
       ]}
     />
-  );
+  )
 
   return (
     <div>
       {renderStep()}
       {renderGoBack()}
     </div>
-  );
-};
+  )
+}
 
-export default SharedAccountOwnershipSetup;
+export default SharedAccountOwnershipSetup

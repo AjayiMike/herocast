@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { makeGraphqlRequest } from '@/common/helpers/graphql';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import get from 'lodash.get';
-import isEmpty from 'lodash.isempty';
-import { openWindow } from '../../helpers/navigation';
+import React, { useEffect, useState } from 'react'
+import { makeGraphqlRequest } from '@/common/helpers/graphql'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
+import get from 'lodash.get'
+import isEmpty from 'lodash.isempty'
+import { openWindow } from '../../helpers/navigation'
 
 type StatsType = {
-  name: string;
-  value: string | number;
-  unit?: string;
-};
+  name: string
+  value: string | number
+  unit?: string
+}
 
 const NOUNS_BUILDER_GRAPHQL_ENDPOINT = {
   mainnet: 'https://api.thegraph.com/subgraphs/name/neokry/nouns-builder-mainnet',
   ethereum: 'https://api.thegraph.com/subgraphs/name/neokry/nouns-builder-mainnet',
   zora: 'https://api.goldsky.com/api/public/project_clkk1ucdyf6ak38svcatie9tf/subgraphs/nouns-builder-zora-mainnet/stable/gn',
   optimism: 'https://api.thegraph.com/subgraphs/name/neokry/noun-builder-optimism-mainnet',
-};
+}
 
 const query = `
   query a($tokenAddress: String!, $proposalNumber: Int, $proposalId: String, $tokenId: Int) {
@@ -48,38 +48,38 @@ const query = `
       }
     }
   }
-`;
+`
 
 const NounsBuildEmbed = ({ url }: { url: string }) => {
   const [data, setData] = useState<{
-    dao: { name: string; proposals: any[]; tokens: any[] };
-  } | null>(null);
+    dao: { name: string; proposals: any[]; tokens: any[] }
+  } | null>(null)
 
   useEffect(() => {
     const getData = async () => {
-      let chain = 'mainnet';
+      let chain = 'mainnet'
       let tokenAddress = '',
         proposalNumber: number | null = null,
         proposalId = '',
-        tokenId: number | null = null;
-      const firstParam = url.split('https://nouns.build/dao/')[1].split('/')[0];
+        tokenId: number | null = null
+      const firstParam = url.split('https://nouns.build/dao/')[1].split('/')[0]
       if (firstParam.startsWith('0x')) {
-        tokenAddress = firstParam;
+        tokenAddress = firstParam
       } else {
-        tokenAddress = url.split('https://nouns.build/dao/')[1].split('/')[1];
-        chain = firstParam;
+        tokenAddress = url.split('https://nouns.build/dao/')[1].split('/')[1]
+        chain = firstParam
       }
 
-      const proposalStr = url.split('vote/')[1];
+      const proposalStr = url.split('vote/')[1]
       if (proposalStr) {
         if (proposalStr.startsWith('0x')) {
-          proposalId = proposalStr;
+          proposalId = proposalStr
         } else {
-          proposalNumber = parseInt(proposalStr);
+          proposalNumber = parseInt(proposalStr)
         }
       } else {
-        const urlParts = url.split('/');
-        tokenId = parseInt(urlParts[urlParts.length - 1]);
+        const urlParts = url.split('/')
+        tokenId = parseInt(urlParts[urlParts.length - 1])
       }
 
       const variables = {
@@ -87,39 +87,39 @@ const NounsBuildEmbed = ({ url }: { url: string }) => {
         proposalNumber,
         proposalId,
         tokenId,
-      };
-
-      const endpoint = get(NOUNS_BUILDER_GRAPHQL_ENDPOINT, chain);
-      if (!endpoint) {
-        console.error('NounsBuildEmbed: no endpoint for chain', chain);
-        return;
       }
 
-      setData(await makeGraphqlRequest(endpoint, query, variables));
-    };
-    try {
-      getData();
-    } catch (e) {
-      console.log('NounsBuildEmbed: ', url, 'error', e);
+      const endpoint = get(NOUNS_BUILDER_GRAPHQL_ENDPOINT, chain)
+      if (!endpoint) {
+        console.error('NounsBuildEmbed: no endpoint for chain', chain)
+        return
+      }
+
+      setData(await makeGraphqlRequest(endpoint, query, variables))
     }
-  }, []);
+    try {
+      getData()
+    } catch (e) {
+      console.log('NounsBuildEmbed: ', url, 'error', e)
+    }
+  }, [])
 
   const getProposalStatus = (proposal) => {
     if (proposal.voteEnd * 1000 < Date.now()) {
       if (proposal.executed) {
-        return 'Executed';
+        return 'Executed'
       } else if (proposal.queued) {
-        return 'Queued';
+        return 'Queued'
       } else if (proposal.canceled) {
-        return 'Canceled';
+        return 'Canceled'
       }
-      return 'Done';
+      return 'Done'
     }
     if (proposal.voteStart * 1000 > Date.now()) {
-      return 'Not started';
+      return 'Not started'
     }
-    return 'In progress';
-  };
+    return 'In progress'
+  }
 
   const getProposalStats = (proposal) => {
     return [
@@ -135,26 +135,26 @@ const NounsBuildEmbed = ({ url }: { url: string }) => {
         name: 'Date starting',
         value: new Date(Number(proposal.voteStart) * 1000).toLocaleString(),
       },
-    ];
-  };
+    ]
+  }
 
   const renderContent = () => {
     if (!data || !data.dao || (isEmpty(data.dao.proposals) && isEmpty(data.dao.tokens))) {
-      return null;
+      return null
     }
-    const proposal = data.dao.proposals[0];
-    const token = data.dao.tokens[0];
+    const proposal = data.dao.proposals[0]
+    const token = data.dao.tokens[0]
 
-    let stats: StatsType[] = [];
+    let stats: StatsType[] = []
     if (proposal) {
-      stats = getProposalStats(proposal);
+      stats = getProposalStats(proposal)
     } else if (token) {
       stats = [
         {
           name: 'Minted at',
           value: new Date(Number(token.mintedAt) * 1000).toLocaleDateString(),
         },
-      ];
+      ]
     }
 
     return (
@@ -214,14 +214,14 @@ const NounsBuildEmbed = ({ url }: { url: string }) => {
           )}
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="max-w-fit text-foreground rounded-lg border border-gray-500" key={`nouns-build-embed-${url}`}>
       {!isEmpty(data) && renderContent()}
     </div>
-  );
-};
+  )
+}
 
-export default NounsBuildEmbed;
+export default NounsBuildEmbed

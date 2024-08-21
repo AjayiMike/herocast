@@ -1,31 +1,31 @@
-import React from 'react';
-import { useAccountStore } from '@/stores/useAccountStore';
-import EmptyStateWithAction from '@/common/components/EmptyStateWithAction';
-import isEmpty from 'lodash.isempty';
-import ChannelsOverview from './ChannelsOverview';
-import { useRouter } from 'next/router';
-import { useDataStore } from '@/stores/useDataStore';
-import ProfileInfo from './ProfileInfo';
-import SearchesOverview from './SearchesOverview';
-import ListsOverview from './ListsOverview';
-import ManageListsOverview from './ManageListsOverview';
+import React from 'react'
+import { useAccountStore } from '@/stores/useAccountStore'
+import EmptyStateWithAction from '@/common/components/EmptyStateWithAction'
+import isEmpty from 'lodash.isempty'
+import ChannelsOverview from './ChannelsOverview'
+import { useRouter } from 'next/router'
+import { useDataStore } from '@/stores/useDataStore'
+import ProfileInfo from './ProfileInfo'
+import SearchesOverview from './SearchesOverview'
+import ListsOverview from './ListsOverview'
+import ManageListsOverview from './ManageListsOverview'
 
 type RightSidebarProps = {
-  showFeeds?: boolean;
-  showSearches?: boolean;
-  showAuthorInfo?: boolean;
-  showManageLists?: boolean;
-  showLists?: boolean;
-};
+  showFeeds?: boolean
+  showSearches?: boolean
+  showAuthorInfo?: boolean
+  showManageLists?: boolean
+  showLists?: boolean
+}
 
 const RightSidebar = ({ showFeeds, showSearches, showLists, showManageLists, showAuthorInfo }: RightSidebarProps) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const { isHydrated, accounts, selectedAccountIdx } = useAccountStore();
-  const { selectedCast } = useDataStore();
-  const selectedAccount = accounts[selectedAccountIdx];
+  const { isHydrated, accounts, selectedAccountIdx } = useAccountStore()
+  const { selectedCast } = useDataStore()
+  const selectedAccount = accounts[selectedAccountIdx]
 
-  const hasAccounts = !isEmpty(accounts);
+  const hasAccounts = !isEmpty(accounts)
 
   const renderEmptyState = () => (
     <div className="ml-6">
@@ -36,17 +36,17 @@ const RightSidebar = ({ showFeeds, showSearches, showLists, showManageLists, sho
         submitText="Connect account"
       />
     </div>
-  );
+  )
 
   const renderAuthorInfo = () => {
-    if (!showAuthorInfo || !selectedCast) return null;
+    if (!showAuthorInfo || !selectedCast) return null
 
     return (
       <div className="pt-16 mx-4">
         <ProfileInfo fid={selectedCast.author.fid} viewerFid={Number(selectedAccount.platformAccountId)} showFullInfo />
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <aside
@@ -66,7 +66,7 @@ const RightSidebar = ({ showFeeds, showSearches, showLists, showManageLists, sho
         {showSearches && <SearchesOverview />}
       </div>
     </aside>
-  );
-};
+  )
+}
 
-export default RightSidebar;
+export default RightSidebar

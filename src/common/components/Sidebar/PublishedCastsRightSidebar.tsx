@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { SidebarHeader } from './SidebarHeader';
-import { CastRow } from '../CastRow';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { useAccountStore } from '@/stores/useAccountStore';
-import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v1';
-import { useDraftStore } from '@/stores/useDraftStore';
-import orderBy from 'lodash.orderby';
-import filter from 'lodash.filter';
-import { UserProfile } from '@/stores/useDataStore';
-import { getProfileFetchIfNeeded } from '@/common/helpers/profileUtils';
-import { UUID } from 'crypto';
-import isEmpty from 'lodash.isempty';
-import uniqBy from 'lodash.uniqby';
+import React, { useEffect, useState } from 'react'
+import { SidebarHeader } from './SidebarHeader'
+import { CastRow } from '../CastRow'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { useAccountStore } from '@/stores/useAccountStore'
+import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v1'
+import { useDraftStore } from '@/stores/useDraftStore'
+import orderBy from 'lodash.orderby'
+import filter from 'lodash.filter'
+import { UserProfile } from '@/stores/useDataStore'
+import { getProfileFetchIfNeeded } from '@/common/helpers/profileUtils'
+import { UUID } from 'crypto'
+import isEmpty from 'lodash.isempty'
+import uniqBy from 'lodash.uniqby'
 
 const convertDraftToFakeCast = (
   draft: any,
@@ -33,58 +33,55 @@ const convertDraftToFakeCast = (
   mentionedProfiles: [],
   embeds: [],
   accountId: draft.accountId,
-});
+})
 
 const PublishedCastsRightSidebar = () => {
-  const { drafts } = useDraftStore();
-  const [casts, setCasts] = useState<CastWithInteractions[]>([]);
-  const selectedAccount = useAccountStore((state) => state.accounts[state.selectedAccountIdx]);
-  const selectedAccountFid = selectedAccount?.platformAccountId;
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { drafts } = useDraftStore()
+  const [casts, setCasts] = useState<CastWithInteractions[]>([])
+  const selectedAccount = useAccountStore((state) => state.accounts[state.selectedAccountIdx])
+  const selectedAccountFid = selectedAccount?.platformAccountId
+  const [profile, setProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
-    console.log('getProfileFetchIfNeeded()');
+    console.log('getProfileFetchIfNeeded()')
     const fetchProfile = async () => {
       const res = await getProfileFetchIfNeeded({
         fid: selectedAccountFid,
         viewerFid: selectedAccountFid,
-      });
-      setProfile(res);
-    };
+      })
+      setProfile(res)
+    }
 
     if (isEmpty(profile) && selectedAccountFid) {
-      fetchProfile();
+      fetchProfile()
     }
-  }, [profile, selectedAccountFid]);
+  }, [profile, selectedAccountFid])
 
   useEffect(() => {
     const fetchCasts = async () => {
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
 
       const res = await neynarClient.fetchAllCastsCreatedByUser(Number(selectedAccountFid), {
         limit: 5,
         viewerFid: Number(selectedAccountFid),
-      });
-      setCasts(res.result.casts);
-    };
+      })
+      setCasts(res.result.casts)
+    }
 
     if (selectedAccountFid) {
-      fetchCasts();
+      fetchCasts()
     }
-  }, [selectedAccountFid, drafts.length]);
+  }, [selectedAccountFid, drafts.length])
 
   const publishedDraftsAsFakeCasts = profile
     ? drafts
         .filter((draft) => draft.accountId === selectedAccount.id && draft.status === 'published' && draft.hash)
         .map((draft) => convertDraftToFakeCast(draft, profile))
-    : [];
+    : []
 
-  const filteredCasts = filter(
-    [...casts, ...publishedDraftsAsFakeCasts],
-    (cast) => cast.timestamp && cast?.author?.fid
-  );
+  const filteredCasts = filter([...casts, ...publishedDraftsAsFakeCasts], (cast) => cast.timestamp && cast?.author?.fid)
 
-  const castsForSidebar = orderBy(uniqBy(filteredCasts, 'hash'), 'timestamp', 'desc');
+  const castsForSidebar = orderBy(uniqBy(filteredCasts, 'hash'), 'timestamp', 'desc')
 
   return (
     <aside
@@ -106,7 +103,7 @@ const PublishedCastsRightSidebar = () => {
         </ul>
       </div>
     </aside>
-  );
-};
+  )
+}
 
-export default PublishedCastsRightSidebar;
+export default PublishedCastsRightSidebar

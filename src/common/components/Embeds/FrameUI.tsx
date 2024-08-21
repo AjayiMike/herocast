@@ -1,11 +1,11 @@
-import type { ImgHTMLAttributes } from 'react';
-import React, { useState } from 'react';
-import type { Frame, FrameButton } from 'frames.js';
-import type { FrameStackMessage, FrameStackRequestError, FrameState, FrameTheme } from '@frames.js/render';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Loading } from '../Loading';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import type { ImgHTMLAttributes } from 'react'
+import React, { useState } from 'react'
+import type { Frame, FrameButton } from 'frames.js'
+import type { FrameStackMessage, FrameStackRequestError, FrameState, FrameTheme } from '@frames.js/render'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Loading } from '../Loading'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export const defaultTheme: Required<FrameTheme> = {
   buttonBg: '#fff',
@@ -14,7 +14,7 @@ export const defaultTheme: Required<FrameTheme> = {
   buttonColor: '#444',
   buttonRadius: '4',
   bg: '#efefef',
-};
+}
 
 const messageSquareIcon = (
   <svg
@@ -31,7 +31,7 @@ const messageSquareIcon = (
   >
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
   </svg>
-);
+)
 
 const octagonXIcon = (
   <svg
@@ -49,26 +49,26 @@ const octagonXIcon = (
     <path d="m15 9-6 6" />
     <path d="m9 9 6 6" />
   </svg>
-);
+)
 
 const getThemeWithDefaults = (theme: FrameTheme): FrameTheme => {
   return {
     ...defaultTheme,
     ...theme,
-  };
-};
+  }
+}
 
 type MessageTooltipProps = {
-  message: string;
+  message: string
   /**
    * @defaultValue 'message'
    */
-  variant?: 'message' | 'error';
+  variant?: 'message' | 'error'
   /**
    * @defaultValue false
    */
-  inline?: boolean;
-};
+  inline?: boolean
+}
 
 function MessageTooltip({ inline = false, message, variant = 'message' }: MessageTooltipProps): JSX.Element {
   return (
@@ -80,40 +80,40 @@ function MessageTooltip({ inline = false, message, variant = 'message' }: Messag
       {variant === 'message' ? messageSquareIcon : octagonXIcon}
       {message}
     </div>
-  );
+  )
 }
 
 function getErrorMessageFromFramesStackItem(item: FrameStackMessage | FrameStackRequestError): string {
   if (item.status === 'message') {
-    return item.message;
+    return item.message
   }
 
   if (item.requestError instanceof Error) {
-    return item.requestError.message;
+    return item.requestError.message
   }
 
-  return 'An error occurred';
+  return 'An error occurred'
 }
 
 export type FrameUIProps = {
-  frameState: FrameState;
-  theme?: FrameTheme;
-  FrameImage?: React.FC<ImgHTMLAttributes<HTMLImageElement> & { src: string }>;
-  allowPartialFrame?: boolean;
-};
+  frameState: FrameState
+  theme?: FrameTheme
+  FrameImage?: React.FC<ImgHTMLAttributes<HTMLImageElement> & { src: string }>
+  allowPartialFrame?: boolean
+}
 
 export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: FrameUIProps): React.JSX.Element | null {
-  const [isImageLoading, setIsImageLoading] = useState(true);
-  const currentFrame = frameState.currentFrameStackItem;
-  const isLoading = currentFrame?.status === 'pending' || isImageLoading;
-  const resolvedTheme = getThemeWithDefaults(theme ?? {});
+  const [isImageLoading, setIsImageLoading] = useState(true)
+  const currentFrame = frameState.currentFrameStackItem
+  const isLoading = currentFrame?.status === 'pending' || isImageLoading
+  const resolvedTheme = getThemeWithDefaults(theme ?? {})
 
   if (!frameState.homeframeUrl) {
-    return <MessageTooltip inline message="Missing frame url" variant="error" />;
+    return <MessageTooltip inline message="Missing frame url" variant="error" />
   }
 
   if (!currentFrame) {
-    return null;
+    return null
   }
 
   if (
@@ -126,20 +126,20 @@ export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: Fr
       currentFrame.frameResult.frame.buttons
     )
   ) {
-    return <MessageTooltip inline message="Invalid frame" variant="error" />;
+    return <MessageTooltip inline message="Invalid frame" variant="error" />
   }
 
-  let frame: Frame | Partial<Frame> | undefined;
+  let frame: Frame | Partial<Frame> | undefined
 
   if (currentFrame.status === 'done') {
-    frame = currentFrame.frameResult.frame;
+    frame = currentFrame.frameResult.frame
   } else if (currentFrame.status === 'message') {
-    frame = currentFrame.request.sourceFrame;
+    frame = currentFrame.request.sourceFrame
   } else if (currentFrame.status === 'requestError') {
-    frame = 'sourceFrame' in currentFrame.request ? currentFrame.request.sourceFrame : undefined;
+    frame = 'sourceFrame' in currentFrame.request ? currentFrame.request.sourceFrame : undefined
   }
 
-  const ImageEl = FrameImage ? FrameImage : 'img';
+  const ImageEl = FrameImage ? FrameImage : 'img'
   return (
     <div
       //   style={{ backgroundColor: resolvedTheme.bg }}
@@ -190,13 +190,13 @@ export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: Fr
               aspectRatio: (frame.imageAspectRatio ?? '1.91:1') === '1:1' ? '1/1' : '1.91/1',
             }}
             onLoadStart={() => {
-              setIsImageLoading(true);
+              setIsImageLoading(true)
             }}
             onLoad={() => {
-              setIsImageLoading(false);
+              setIsImageLoading(false)
             }}
             onError={() => {
-              setIsImageLoading(false);
+              setIsImageLoading(false)
             }}
           />
         )}
@@ -212,7 +212,7 @@ export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: Fr
           type="text"
           placeholder={frame.inputText}
           onChange={(e) => {
-            frameState.setInputText(e.target.value);
+            frameState.setInputText(e.target.value)
           }}
         />
       ) : null}
@@ -228,7 +228,7 @@ export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: Fr
                 flex: '1 1 0px',
               }}
               onClick={(e) => {
-                e.preventDefault();
+                e.preventDefault()
                 Promise.resolve(
                   frameState.onButtonPress(
                     // Partial frame could have enough data to handle button press
@@ -238,8 +238,8 @@ export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: Fr
                   )
                 ).catch((e: unknown) => {
                   // eslint-disable-next-line no-console -- provide feedback to the user
-                  console.error(e);
-                });
+                  console.error(e)
+                })
               }}
               // eslint-disable-next-line react/no-array-index-key -- this is fine
               key={index}
@@ -268,5 +268,5 @@ export function FrameUI({ frameState, theme, FrameImage, allowPartialFrame }: Fr
         </div>
       ) : null}
     </div>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-import React from 'react';
-import BigOptionSelector from '@/common/components/BigOptionSelector';
-import { CUSTOM_CHANNELS, useAccountStore } from '@/stores/useAccountStore';
-import { useRouter } from 'next/router';
-import { AccountPlatformType, AccountStatusType } from '../constants/accounts';
+import React from 'react'
+import BigOptionSelector from '@/common/components/BigOptionSelector'
+import { CUSTOM_CHANNELS, useAccountStore } from '@/stores/useAccountStore'
+import { useRouter } from 'next/router'
+import { AccountPlatformType, AccountStatusType } from '../constants/accounts'
 
 const WelcomeCards = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const { accounts, setSelectedChannelUrl } = useAccountStore();
+  const { accounts, setSelectedChannelUrl } = useAccountStore()
 
-  const hasAccounts = accounts.length > 0;
-  const hasPendingAccount = accounts.some((account) => account.status === AccountStatusType.pending);
+  const hasAccounts = accounts.length > 0
+  const hasPendingAccount = accounts.some((account) => account.status === AccountStatusType.pending)
   const isReadOnly =
-    hasAccounts && accounts.every((account) => account.platform === AccountPlatformType.farcaster_local_readonly);
+    hasAccounts && accounts.every((account) => account.platform === AccountPlatformType.farcaster_local_readonly)
   return (
     <div className="m-8 flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
       <BigOptionSelector
@@ -43,8 +43,8 @@ const WelcomeCards = () => {
                 description: 'No need to signup if you just want to checkout herocast',
                 buttonText: 'Trending Feed →',
                 onClick: () => {
-                  setSelectedChannelUrl(CUSTOM_CHANNELS.TRENDING);
-                  router.push('/feeds');
+                  setSelectedChannelUrl(CUSTOM_CHANNELS.TRENDING)
+                  router.push('/feeds')
                 },
               }
             : undefined,
@@ -65,7 +65,7 @@ const WelcomeCards = () => {
         ]}
       />
     </div>
-  );
-};
+  )
+}
 
-export default WelcomeCards;
+export default WelcomeCards

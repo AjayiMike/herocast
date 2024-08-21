@@ -1,11 +1,11 @@
-import { init, fetchQuery } from '@airstack/node';
+import { init, fetchQuery } from '@airstack/node'
 
-init(process.env.NEXT_PUBLIC_AIRSTACK_API_KEY!);
+init(process.env.NEXT_PUBLIC_AIRSTACK_API_KEY!)
 
 export type AirstackSocialInfo = {
-  socialCapitalRank: number;
-  userCreatedAt: number;
-};
+  socialCapitalRank: number
+  userCreatedAt: number
+}
 
 export async function getAirstackSocialInfoForFid(fid: string): Promise<AirstackSocialInfo | null> {
   const query = `query MyQuery {
@@ -27,24 +27,24 @@ export async function getAirstackSocialInfoForFid(fid: string): Promise<Airstack
             userCreatedAtBlockTimestamp
           }
         }
-      }`;
+      }`
   try {
-    const { data, error } = await fetchQuery(query);
+    const { data, error } = await fetchQuery(query)
     if (error) {
-      console.error('Error fetching airstack capital score:', error);
-      return null;
+      console.error('Error fetching airstack capital score:', error)
+      return null
     }
-    const socialInfo = data?.Socials?.Social?.[0];
+    const socialInfo = data?.Socials?.Social?.[0]
     if (!socialInfo) {
-      return null;
+      return null
     }
 
     return {
       socialCapitalRank: socialInfo.socialCapital.socialCapitalRank,
       userCreatedAt: socialInfo.userCreatedAtBlockTimestamp,
-    };
+    }
   } catch (error) {
-    console.error('Error fetching Airstack data:', error);
-    return null;
+    console.error('Error fetching Airstack data:', error)
+    return null
   }
 }

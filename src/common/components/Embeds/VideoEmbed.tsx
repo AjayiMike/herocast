@@ -1,9 +1,9 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
+import React from 'react'
+import dynamic from 'next/dynamic'
 
 const ReactHlsPlayer = dynamic(() => import('@gumlet/react-hls-player'), {
   ssr: false,
-});
+})
 
 const VideoEmbed = ({ url }: { url: string }) => {
   // function playVideo() {
@@ -18,7 +18,7 @@ const VideoEmbed = ({ url }: { url: string }) => {
   //   playerRef.current.controls = !playerRef.current.controls;
   // }
 
-  const playerRef = React.useRef<HTMLVideoElement | null>(null);
+  const playerRef = React.useRef<HTMLVideoElement | null>(null)
 
   return (
     <div key={`video-embed-${url}`} className="">
@@ -32,7 +32,7 @@ const VideoEmbed = ({ url }: { url: string }) => {
         className="rounded-md max-w-min max-h-72 object-left"
       />
     </div>
-  );
-};
+  )
+}
 
-export default VideoEmbed;
+export default VideoEmbed

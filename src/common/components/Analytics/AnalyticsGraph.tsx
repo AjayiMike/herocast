@@ -1,34 +1,34 @@
-'use client';
+'use client'
 
-import React, { useMemo } from 'react';
-import { format, subDays } from 'date-fns';
-import { Interval } from '@/common/helpers/search';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useMemo } from 'react'
+import { format, subDays } from 'date-fns'
+import { Interval } from '@/common/helpers/search'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type AnalyticsGraphProps = {
-  analyticsKey: string;
-  aggregated: { timestamp: string; count: number }[];
-  isLoading: boolean;
-  interval?: Interval;
-};
+  analyticsKey: string
+  aggregated: { timestamp: string; count: number }[]
+  isLoading: boolean
+  interval?: Interval
+}
 
 const AnalyticsGraph: React.FC<AnalyticsGraphProps> = ({ analyticsKey, aggregated, isLoading = false, interval }) => {
   const data = useMemo(() => {
-    if (!aggregated) return [];
+    if (!aggregated) return []
 
-    let filteredData = aggregated;
+    let filteredData = aggregated
     if (interval) {
-      const cutoffDate = subDays(new Date(), interval === Interval.d7 ? 7 : 30);
-      filteredData = aggregated.filter((item) => new Date(item.timestamp) >= cutoffDate);
+      const cutoffDate = subDays(new Date(), interval === Interval.d7 ? 7 : 30)
+      filteredData = aggregated.filter((item) => new Date(item.timestamp) >= cutoffDate)
     }
 
     return filteredData.map((item) => ({
       date: item.timestamp,
       [analyticsKey]: item.count,
-    }));
-  }, [aggregated, interval]);
+    }))
+  }, [aggregated, interval])
 
   if (data.length === 0) {
     if (isLoading) {
@@ -36,9 +36,9 @@ const AnalyticsGraph: React.FC<AnalyticsGraphProps> = ({ analyticsKey, aggregate
         <div className="w-full h-[180px]">
           <Skeleton className="w-full h-full" />
         </div>
-      );
+      )
     } else {
-      return null;
+      return null
     }
   }
 
@@ -47,7 +47,7 @@ const AnalyticsGraph: React.FC<AnalyticsGraphProps> = ({ analyticsKey, aggregate
       label: analyticsKey,
       color: 'hsl(var(--chart-1))',
     },
-  };
+  }
 
   return (
     <ChartContainer config={chartConfig} className="-ml-8 w-full min-w-full h-full">
@@ -73,7 +73,7 @@ const AnalyticsGraph: React.FC<AnalyticsGraphProps> = ({ analyticsKey, aggregate
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
-                });
+                })
               }}
             />
           }
@@ -90,7 +90,7 @@ const AnalyticsGraph: React.FC<AnalyticsGraphProps> = ({ analyticsKey, aggregate
       </AreaChart>
       {/* </ResponsiveContainer> */}
     </ChartContainer>
-  );
-};
+  )
+}
 
-export default AnalyticsGraph;
+export default AnalyticsGraph

@@ -1,61 +1,61 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { SelectableListWithHotkeys } from '@/common/components/SelectableListWithHotkeys';
-import { CastRow } from '@/common/components/CastRow';
-import { CastThreadView } from '@/common/components/CastThreadView';
-import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { Key } from 'ts-key-enum';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { useAccountStore } from '@/stores/useAccountStore';
-import { useDataStore } from '@/stores/useDataStore';
-import { getProfileFetchIfNeeded } from '@/common/helpers/profileUtils';
-import isEmpty from 'lodash.isempty';
-import { useListStore } from '@/stores/useListStore';
-import { map, uniq, debounce } from 'lodash';
-import SkeletonCastRow from '@/common/components/SkeletonCastRow';
-import { Switch } from '@/components/ui/switch';
-import { IntervalFilter } from '@/common/components/IntervalFilter';
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { SelectableListWithHotkeys } from '@/common/components/SelectableListWithHotkeys'
+import { CastRow } from '@/common/components/CastRow'
+import { CastThreadView } from '@/common/components/CastThreadView'
+import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { Key } from 'ts-key-enum'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { useAccountStore } from '@/stores/useAccountStore'
+import { useDataStore } from '@/stores/useDataStore'
+import { getProfileFetchIfNeeded } from '@/common/helpers/profileUtils'
+import isEmpty from 'lodash.isempty'
+import { useListStore } from '@/stores/useListStore'
+import { map, uniq, debounce } from 'lodash'
+import SkeletonCastRow from '@/common/components/SkeletonCastRow'
+import { Switch } from '@/components/ui/switch'
+import { IntervalFilter } from '@/common/components/IntervalFilter'
 import {
   getFromFidFromSearchTerm,
   getMentionFidFromSearchTerm,
   Interval,
   SearchResponse,
-} from '@/common/helpers/search';
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
-import { cn } from '@/lib/utils';
-import { usePostHog } from 'posthog-js/react';
-import { runFarcasterCastSearch, RawSearchResult, SearchFilters } from '@/common/helpers/search';
-import ManageListModal from '@/common/components/ManageListModal';
-import { useNavigationStore } from '@/stores/useNavigationStore';
-import ClickToCopyText from '@/common/components/ClickToCopyText';
-import { Badge } from '@/components/ui/badge';
-import { UUID } from 'crypto';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
+} from '@/common/helpers/search'
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid'
+import { cn } from '@/lib/utils'
+import { usePostHog } from 'posthog-js/react'
+import { runFarcasterCastSearch, RawSearchResult, SearchFilters } from '@/common/helpers/search'
+import ManageListModal from '@/common/components/ManageListModal'
+import { useNavigationStore } from '@/stores/useNavigationStore'
+import ClickToCopyText from '@/common/components/ClickToCopyText'
+import { Badge } from '@/components/ui/badge'
+import { UUID } from 'crypto'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
-const APP_FID = process.env.NEXT_PUBLIC_APP_FID!;
-const SEARCH_LIMIT_INITIAL_LOAD = 5;
-const SEARCH_LIMIT_NEXT_LOAD = 10;
+const APP_FID = process.env.NEXT_PUBLIC_APP_FID!
+const SEARCH_LIMIT_INITIAL_LOAD = 5
+const SEARCH_LIMIT_NEXT_LOAD = 10
 
 export const DEFAULT_FILTERS: SearchFilters = {
   onlyPowerBadge: true,
   interval: Interval.d7,
   hideReplies: true,
-};
+}
 
-const intervals = [Interval.d1, Interval.d7, Interval.d14];
+const intervals = [Interval.d1, Interval.d7, Interval.d14]
 
 const FilterBadge = ({
   children,
   isActive,
   action,
 }: {
-  children: React.ReactNode;
-  isActive: boolean;
-  action: () => void;
+  children: React.ReactNode
+  isActive: boolean
+  action: () => void
 }) => {
   return (
     <Badge
@@ -68,205 +68,205 @@ const FilterBadge = ({
     >
       {children}
     </Badge>
-  );
-};
+  )
+}
 
 export default function SearchPage() {
-  const posthog = usePostHog();
+  const posthog = usePostHog()
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [casts, setCasts] = useState<CastWithInteractions[]>([]);
-  const [castHashes, setCastHashes] = useState<RawSearchResult[]>([]);
-  const [selectedCastIdx, setSelectedCastIdx] = useState(-1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchCounter, setSearchCounter] = useState(0);
-  const [filterByPowerBadge, setFilterByPowerBadge] = useState(false);
-  const [filterByHideReplies, setFilterByHideReplies] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const activeSearchCounter = useRef(0);
-  const [interval, setInterval] = useState<Interval>();
-  const [showFilter, setShowFilter] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
-  const [showCastThreadView, setShowCastThreadView] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('')
+  const [casts, setCasts] = useState<CastWithInteractions[]>([])
+  const [castHashes, setCastHashes] = useState<RawSearchResult[]>([])
+  const [selectedCastIdx, setSelectedCastIdx] = useState(-1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchCounter, setSearchCounter] = useState(0)
+  const [filterByPowerBadge, setFilterByPowerBadge] = useState(false)
+  const [filterByHideReplies, setFilterByHideReplies] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const activeSearchCounter = useRef(0)
+  const [interval, setInterval] = useState<Interval>()
+  const [showFilter, setShowFilter] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [showCastThreadView, setShowCastThreadView] = useState(false)
 
-  const { isManageListModalOpen, setIsManageListModalOpen } = useNavigationStore();
-  const { addSearch, addList, setSelectedListId, lists } = useListStore();
+  const { isManageListModalOpen, setIsManageListModalOpen } = useNavigationStore()
+  const { addSearch, addList, setSelectedListId, lists } = useListStore()
   const selectedList = useListStore((state) =>
     state.selectedListId !== undefined ? state.lists.find((list) => list.id === state.selectedListId) : undefined
-  );
-  const canSearch = searchTerm.trim().length >= 3;
-  const { updateSelectedCast } = useDataStore();
+  )
+  const canSearch = searchTerm.trim().length >= 3
+  const { updateSelectedCast } = useDataStore()
 
-  const selectedAccount = useAccountStore((state) => state.accounts[state.selectedAccountIdx]);
-  const viewerFid = selectedAccount?.platformAccountId || APP_FID;
+  const selectedAccount = useAccountStore((state) => state.accounts[state.selectedAccountIdx])
+  const viewerFid = selectedAccount?.platformAccountId || APP_FID
 
   const debouncedUserSearch = useCallback(
     debounce(async (term: string) => {
       if (term.length > 2 && viewerFid) {
         try {
-          getMentionFidFromSearchTerm(term, viewerFid);
+          getMentionFidFromSearchTerm(term, viewerFid)
         } catch (error) {
-          console.error('Error searching for users:', error);
+          console.error('Error searching for users:', error)
         }
       }
     }, 300),
     [viewerFid]
-  );
+  )
 
   useEffect(() => {
-    debouncedUserSearch(searchTerm);
-  }, [searchTerm, debouncedUserSearch]);
+    debouncedUserSearch(searchTerm)
+  }, [searchTerm, debouncedUserSearch])
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
+    const urlParams = new URLSearchParams(window.location.search)
+    const searchParam = urlParams.get('search')
     if (searchParam) {
-      setSearchTerm(searchParam);
-      onSearch(searchParam, DEFAULT_FILTERS);
+      setSearchTerm(searchParam)
+      onSearch(searchParam, DEFAULT_FILTERS)
     }
 
-    const listId = urlParams.get('list');
+    const listId = urlParams.get('list')
     if (listId) {
-      setSelectedListId(listId as UUID);
+      setSelectedListId(listId as UUID)
     }
 
     // if navigating away, reset the selected cast
     return () => {
-      updateSelectedCast();
-    };
-  }, []);
+      updateSelectedCast()
+    }
+  }, [])
 
   useEffect(() => {
-    if (selectedCastIdx === -1) return;
+    if (selectedCastIdx === -1) return
 
     if (isEmpty(casts)) {
-      updateSelectedCast();
+      updateSelectedCast()
     } else {
-      updateSelectedCast(casts[selectedCastIdx]);
+      updateSelectedCast(casts[selectedCastIdx])
     }
-  }, [selectedCastIdx, casts]);
+  }, [selectedCastIdx, casts])
 
   useEffect(() => {
     if (selectedList && selectedList.type === 'search') {
       const { term, filters } = selectedList.contents as {
-        term?: string;
-        filters?: SearchFilters;
-      };
+        term?: string
+        filters?: SearchFilters
+      }
 
-      const { onlyPowerBadge } = filters || DEFAULT_FILTERS;
-      setFilterByPowerBadge(onlyPowerBadge);
+      const { onlyPowerBadge } = filters || DEFAULT_FILTERS
+      setFilterByPowerBadge(onlyPowerBadge)
 
       if (term) {
-        setSearchTerm(term);
-        onSearch(term, filters || DEFAULT_FILTERS);
+        setSearchTerm(term)
+        onSearch(term, filters || DEFAULT_FILTERS)
       }
     }
-  }, [selectedList]);
+  }, [selectedList])
 
   const onChange = async (text: string) => {
-    setSearchTerm(text);
-  };
+    setSearchTerm(text)
+  }
 
   const addCastHashes = (newCastHashes: RawSearchResult[], reset: boolean) => {
-    console.log('addCastHashes', newCastHashes?.length, 'reset: ', reset);
-    setCastHashes((prevCastHashes) => uniq([...(reset ? [] : prevCastHashes), ...(newCastHashes || [])]));
-  };
+    console.log('addCastHashes', newCastHashes?.length, 'reset: ', reset)
+    setCastHashes((prevCastHashes) => uniq([...(reset ? [] : prevCastHashes), ...(newCastHashes || [])]))
+  }
 
   const resetState = () => {
-    setError(null);
-    setIsLoading(true);
-    setCasts([]);
-    setCastHashes([]);
-    setHasMore(true);
-  };
+    setError(null)
+    setIsLoading(true)
+    setCasts([])
+    setCastHashes([])
+    setHasMore(true)
+  }
 
   const getFilters = () => ({
     interval,
     orderBy: 'timestamp DESC',
     onlyPowerBadge: filterByPowerBadge,
     hideReplies: filterByHideReplies,
-  });
+  })
 
   const onSearch = useCallback(
     async (term?: string, filters?: SearchFilters) => {
-      const newSearchCounter = searchCounter + 1;
-      setSearchCounter(newSearchCounter);
-      activeSearchCounter.current = newSearchCounter;
+      const newSearchCounter = searchCounter + 1
+      setSearchCounter(newSearchCounter)
+      activeSearchCounter.current = newSearchCounter
 
       if (!term) {
-        term = searchTerm;
+        term = searchTerm
       }
 
       if (isEmpty(filters)) {
-        filters = getFilters();
+        filters = getFilters()
       }
 
-      resetState();
-      setShowCastThreadView(false);
+      resetState()
+      setShowCastThreadView(false)
       posthog.capture('user_start_castSearch', {
         term,
-      });
-      const startedAt = Date.now();
+      })
+      const startedAt = Date.now()
       try {
-        const mentionFid = await getMentionFidFromSearchTerm(term, viewerFid);
-        const fromFid = await getFromFidFromSearchTerm(term, viewerFid);
+        const mentionFid = await getMentionFidFromSearchTerm(term, viewerFid)
+        const fromFid = await getFromFidFromSearchTerm(term, viewerFid)
         const searchResponse = await runFarcasterCastSearch({
           searchTerm: term,
           filters,
           mentionFid,
           fromFid,
           limit: SEARCH_LIMIT_INITIAL_LOAD,
-        });
+        })
         if (activeSearchCounter.current !== newSearchCounter) {
-          return;
+          return
         }
-        const endedAt = Date.now();
-        const searchResults = searchResponse.results || [];
+        const endedAt = Date.now()
+        const searchResults = searchResponse.results || []
 
         addSearch({
           term,
           startedAt,
           endedAt,
           resultsCount: searchResults.length,
-        });
+        })
         posthog.capture('backend_returns_castSearch', {
           term,
           resultsCount: searchResults.length,
           duration: endedAt - startedAt,
-        });
-        processSearchResponse(searchResponse, SEARCH_LIMIT_INITIAL_LOAD);
+        })
+        processSearchResponse(searchResponse, SEARCH_LIMIT_INITIAL_LOAD)
       } catch (error) {
-        console.error('Failed to search for text', term, error);
+        console.error('Failed to search for text', term, error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     },
     [searchCounter, searchTerm, filterByPowerBadge, filterByHideReplies, interval, posthog]
-  );
+  )
 
   const processSearchResponse = (response: SearchResponse, limit: number) => {
-    const results = response.results || [];
-    console.log('processSearchResponse - results', results.length);
+    const results = response.results || []
+    console.log('processSearchResponse - results', results.length)
     if (results.length < limit) {
-      setHasMore(false);
+      setHasMore(false)
     }
     if (results.length > 0) {
-      addCastHashes(results, false);
+      addCastHashes(results, false)
     }
-    const { isTimeout, error } = response;
+    const { isTimeout, error } = response
     if (isTimeout) {
-      setError(new Error('Search timed out - please try again'));
+      setError(new Error('Search timed out - please try again'))
     } else if (error) {
-      setError(new Error(error));
+      setError(new Error(error))
     }
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   const onContinueSearch = () => {
-    setIsLoading(true);
+    setIsLoading(true)
     posthog.capture('user_start_castSearch', {
       term: searchTerm,
-    });
+    })
     runFarcasterCastSearch({
       searchTerm,
       filters: getFilters(),
@@ -277,60 +277,60 @@ export default function SearchPage() {
       posthog.capture('backend_returns_castSearch', {
         term: searchTerm,
         resultsCount: (response?.results || []).length,
-      });
-      processSearchResponse(response, SEARCH_LIMIT_NEXT_LOAD);
-    });
-  };
+      })
+      processSearchResponse(response, SEARCH_LIMIT_NEXT_LOAD)
+    })
+  }
 
   const onSaveSearch = async () => {
-    const newIdx = lists.reduce((max, list) => Math.max(max, list.idx), 0) + 1;
+    const newIdx = lists.reduce((max, list) => Math.max(max, list.idx), 0) + 1
 
     const contents = {
       term: searchTerm,
       filters: getFilters(),
       enabled_daily_email: true,
-    };
+    }
     addList({
       name: searchTerm,
       type: 'search',
       contents,
       idx: newIdx,
       account_id: selectedAccount?.id,
-    });
+    })
     posthog.capture('user_save_list', {
       contents,
-    });
-  };
+    })
+  }
 
   useHotkeys([Key.Enter, 'meta+enter'], () => onSearch(), [onSearch], {
     enableOnFormTags: true,
     enabled: canSearch && !isLoading && !isManageListModalOpen,
-  });
+  })
 
   useEffect(() => {
     const fetchCasts = async (newCastHashes: string[]) => {
       try {
-        const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+        const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
         const apiResponse = await neynarClient.fetchBulkCasts(newCastHashes, {
           viewerFid: Number(viewerFid),
-        });
-        const allCasts = [...casts, ...apiResponse.result.casts];
-        const sortedCasts = allCasts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        setCasts(sortedCasts);
+        })
+        const allCasts = [...casts, ...apiResponse.result.casts]
+        const sortedCasts = allCasts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        setCasts(sortedCasts)
       } catch (error) {
         if (error instanceof Error) {
-          setError(error);
+          setError(error)
         } else {
-          setError(new Error(`Unknown error occurred ${error}`));
+          setError(new Error(`Unknown error occurred ${error}`))
         }
-        console.error('Failed to fetch casts', newCastHashes, error);
+        console.error('Failed to fetch casts', newCastHashes, error)
       }
-    };
-    const newCastHashes = map(castHashes, 'hash').filter((hash) => !casts.find((cast) => cast.hash === hash));
-    if (newCastHashes.length > 0) {
-      fetchCasts(newCastHashes.slice(0, 2));
     }
-  }, [castHashes, casts, viewerFid]);
+    const newCastHashes = map(castHashes, 'hash').filter((hash) => !casts.find((cast) => cast.hash === hash))
+    if (newCastHashes.length > 0) {
+      fetchCasts(newCastHashes.slice(0, 2))
+    }
+  }, [castHashes, casts, viewerFid])
 
   const renderSearchResultRow = (row: CastWithInteractions, idx: number) => (
     <li
@@ -341,18 +341,18 @@ export default function SearchPage() {
         cast={row}
         isSelected={selectedCastIdx === idx}
         onSelect={() => {
-          setSelectedCastIdx(idx);
-          setShowCastThreadView(true);
+          setSelectedCastIdx(idx)
+          setShowCastThreadView(true)
         }}
         showChannel
         showParentDetails
       />
     </li>
-  );
+  )
 
   const onBack = useCallback(() => {
-    setShowCastThreadView(false);
-  }, []);
+    setShowCastThreadView(false)
+  }, [])
 
   const renderLoadMoreButton = () =>
     hasMore ? (
@@ -366,7 +366,7 @@ export default function SearchPage() {
         </div>
         {renderTryAgainButton()}
       </div>
-    );
+    )
 
   const renderLoadingSpinner = () => (
     <div className="flex items-center justify-center">
@@ -376,7 +376,7 @@ export default function SearchPage() {
         <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce animation-delay-400" />
       </div>
     </div>
-  );
+  )
 
   const renderLoading = () => (
     <div className="my-8 w-full max-w-2xl space-y-8">
@@ -391,7 +391,7 @@ export default function SearchPage() {
           .map((obj) => <SkeletonCastRow key={`skeleton-${obj?.hash}`} text={obj.text} />)
       )}
     </div>
-  );
+  )
 
   const renderPowerBadgeFilter = () => (
     <FilterBadge action={() => setFilterByPowerBadge((prev) => !prev)} isActive={filterByPowerBadge}>
@@ -399,14 +399,14 @@ export default function SearchPage() {
       <img src="/images/ActiveBadge.webp" className="hidden md:flex ml-1 h-4 w-4" alt="power badge" />
       <Switch className="ml-1" aria-label="Toggle powerbadge" checked={filterByPowerBadge} />
     </FilterBadge>
-  );
+  )
 
   const renderHideRepliesFilter = () => (
     <FilterBadge action={() => setFilterByHideReplies((prev) => !prev)} isActive={filterByHideReplies}>
       Hide replies
       <Switch className="ml-1" aria-label="Toggle hide replies" checked={filterByHideReplies} />
     </FilterBadge>
-  );
+  )
 
   const renderTryAgainButton = () => (
     <Button
@@ -418,11 +418,11 @@ export default function SearchPage() {
     >
       Try again
     </Button>
-  );
+  )
 
   const renderIntervalFilter = () => (
     <IntervalFilter intervals={intervals} defaultInterval={Interval.d7} updateInterval={setInterval} />
-  );
+  )
 
   return (
     <div className="min-w-0 flex-1 px-6 py-4">
@@ -517,8 +517,8 @@ export default function SearchPage() {
             selectedIdx={selectedCastIdx}
             setSelectedIdx={setSelectedCastIdx}
             onSelect={(idx) => {
-              setSelectedCastIdx(idx);
-              setShowCastThreadView(true);
+              setSelectedCastIdx(idx)
+              setShowCastThreadView(true)
             }}
           />
           {castHashes.length > 0 && (
@@ -539,5 +539,5 @@ export default function SearchPage() {
         <CastThreadView cast={casts[selectedCastIdx]} onBack={onBack} />
       )}
     </div>
-  );
+  )
 }

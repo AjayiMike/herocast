@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { Button } from '@/components/ui/button';
-import { useAccountModal, useConnectModal } from '@rainbow-me/rainbowkit';
-import { useAccount, useDisconnect } from 'wagmi';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button'
+import { useAccountModal, useConnectModal } from '@rainbow-me/rainbowkit'
+import { useAccount, useDisconnect } from 'wagmi'
+import { cn } from '@/lib/utils'
 
 type SwitchWalletButtonProps = {
-  className?: string;
-};
+  className?: string
+}
 
 const SwitchWalletButton = ({ className }: SwitchWalletButtonProps) => {
-  const { disconnect } = useDisconnect();
-  const { openConnectModal } = useConnectModal();
-  const { openAccountModal } = useAccountModal();
+  const { disconnect } = useDisconnect()
+  const { openConnectModal } = useConnectModal()
+  const { openAccountModal } = useAccountModal()
 
-  const { address, isConnected } = useAccount();
-  const [isClient, setIsClient] = useState<boolean>(false);
+  const { address, isConnected } = useAccount()
+  const [isClient, setIsClient] = useState<boolean>(false)
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    setIsClient(true)
+  }, [])
 
   return (
     <div className={cn('flex flex-col', className)}>
@@ -42,7 +42,7 @@ const SwitchWalletButton = ({ className }: SwitchWalletButtonProps) => {
         }`}
       </Button>
     </div>
-  );
-};
+  )
+}
 
-export default SwitchWalletButton;
+export default SwitchWalletButton

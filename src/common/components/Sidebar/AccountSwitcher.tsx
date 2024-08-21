@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import * as React from 'react';
-import { CaretSortIcon, PlusCircledIcon } from '@radix-ui/react-icons';
+import * as React from 'react'
+import { CaretSortIcon, PlusCircledIcon } from '@radix-ui/react-icons'
 
-import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -14,15 +14,15 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useRouter } from 'next/router';
-import { AccountObjectType, PENDING_ACCOUNT_NAME_PLACEHOLDER, useAccountStore } from '@/stores/useAccountStore';
-import map from 'lodash.map';
-import { AccountPlatformType } from '@/common/constants/accounts';
-import { Badge } from '@/components/ui/badge';
-import get from 'lodash.get';
-import { UserGroupIcon } from '@heroicons/react/24/outline';
+} from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useRouter } from 'next/router'
+import { AccountObjectType, PENDING_ACCOUNT_NAME_PLACEHOLDER, useAccountStore } from '@/stores/useAccountStore'
+import map from 'lodash.map'
+import { AccountPlatformType } from '@/common/constants/accounts'
+import { Badge } from '@/components/ui/badge'
+import get from 'lodash.get'
+import { UserGroupIcon } from '@heroicons/react/24/outline'
 
 const groups = [
   {
@@ -33,36 +33,36 @@ const groups = [
     label: 'Local Accounts',
     platforms: [AccountPlatformType.farcaster_local_readonly],
   },
-];
+]
 
-type PopoverTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverTrigger>;
+type PopoverTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverTrigger>
 
 interface AccountSwitcherProps extends PopoverTriggerProps {}
 
 export default function AccountSwitcher({ className }: AccountSwitcherProps) {
-  const router = useRouter();
-  const [open, setOpen] = React.useState(false);
-  const { accounts, selectedAccountIdx, setCurrentAccountById } = useAccountStore();
-  const selectedAccount = accounts[selectedAccountIdx];
+  const router = useRouter()
+  const [open, setOpen] = React.useState(false)
+  const { accounts, selectedAccountIdx, setCurrentAccountById } = useAccountStore()
+  const selectedAccount = accounts[selectedAccountIdx]
 
   const accountsByPlatform = accounts.reduce((acc, account) => {
-    const labelForAccount = groups.find((group) => group.platforms.includes(account.platform))?.label;
+    const labelForAccount = groups.find((group) => group.platforms.includes(account.platform))?.label
     if (!labelForAccount) {
-      console.log('No label found for account', account);
-      return acc;
+      console.log('No label found for account', account)
+      return acc
     }
 
     if (!acc[labelForAccount]) {
-      acc[labelForAccount] = [];
+      acc[labelForAccount] = []
     }
-    acc[labelForAccount].push(account);
-    return acc;
-  }, {});
+    acc[labelForAccount].push(account)
+    return acc
+  }, {})
 
   const renderGroup = (group) => {
-    const accounts = get(accountsByPlatform, group.label, []);
+    const accounts = get(accountsByPlatform, group.label, [])
     if (!accounts.length) {
-      return null;
+      return null
     }
 
     return (
@@ -71,8 +71,8 @@ export default function AccountSwitcher({ className }: AccountSwitcherProps) {
           <CommandItem
             key={account.id}
             onSelect={() => {
-              setCurrentAccountById(account.id);
-              setOpen(false);
+              setCurrentAccountById(account.id)
+              setOpen(false)
             }}
             className={cn('text-sm truncate', selectedAccount?.id === account.id && 'bg-muted')}
           >
@@ -98,8 +98,8 @@ export default function AccountSwitcher({ className }: AccountSwitcherProps) {
           </CommandItem>
         ))}
       </CommandGroup>
-    );
-  };
+    )
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -139,8 +139,8 @@ export default function AccountSwitcher({ className }: AccountSwitcherProps) {
             <CommandGroup>
               <CommandItem
                 onSelect={() => {
-                  setOpen(false);
-                  router.push('/accounts');
+                  setOpen(false)
+                  router.push('/accounts')
                 }}
               >
                 <PlusCircledIcon className="mr-2 h-5 w-5" />
@@ -151,5 +151,5 @@ export default function AccountSwitcher({ className }: AccountSwitcherProps) {
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

@@ -14,4 +14,4 @@ export enum AccountPlatformType {
 export const framesJsAccountStatusMap = {
   pending: 'pending_approval',
   active: 'approved',
-};
+}

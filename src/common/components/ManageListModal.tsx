@@ -1,72 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import Modal from './Modal';
-import { usePostHog } from 'posthog-js/react';
-import { useListStore } from '@/stores/useListStore';
-import { UUID } from 'crypto';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { IntervalFilter } from './IntervalFilter';
-import { Interval } from '../helpers/search';
-import { Switch } from '@/components/ui/switch';
-import { toastSuccessSavedSearchUpdate } from '../helpers/toast';
-import { BellIcon } from '@heroicons/react/24/outline';
+import React, { useEffect, useState } from 'react'
+import Modal from './Modal'
+import { usePostHog } from 'posthog-js/react'
+import { useListStore } from '@/stores/useListStore'
+import { UUID } from 'crypto'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { IntervalFilter } from './IntervalFilter'
+import { Interval } from '../helpers/search'
+import { Switch } from '@/components/ui/switch'
+import { toastSuccessSavedSearchUpdate } from '../helpers/toast'
+import { BellIcon } from '@heroicons/react/24/outline'
 
-const intervals = [Interval.d1, Interval.d7, Interval.d14];
+const intervals = [Interval.d1, Interval.d7, Interval.d14]
 
 const ManageListModal = ({ open, onClose }) => {
-  const posthog = usePostHog();
+  const posthog = usePostHog()
 
-  const { updateList, removeList } = useListStore();
-  const [newName, setNewName] = useState('');
-  const [newSearchTerm, setNewSearchTerm] = useState('');
-  const [isDailyEmailEnabled, setIsDailyEmailEnabled] = useState(false);
+  const { updateList, removeList } = useListStore()
+  const [newName, setNewName] = useState('')
+  const [newSearchTerm, setNewSearchTerm] = useState('')
+  const [isDailyEmailEnabled, setIsDailyEmailEnabled] = useState(false)
 
   const list = useListStore((state) =>
     state.selectedListId !== undefined ? state.lists.find((l) => l.id === state.selectedListId) : undefined
-  );
+  )
   const canSave =
     list &&
     (newName !== list.name ||
       newSearchTerm !== list.contents?.term ||
-      isDailyEmailEnabled !== list.contents?.enabled_daily_email);
+      isDailyEmailEnabled !== list.contents?.enabled_daily_email)
 
   const onClickDelete = (id: UUID) => {
-    removeList(id);
-    posthog.capture('user_delete_list');
-  };
+    removeList(id)
+    posthog.capture('user_delete_list')
+  }
 
   useEffect(() => {
-    if (!list) return;
+    if (!list) return
 
-    setNewName(list?.name);
-    setNewSearchTerm(list?.contents?.term);
-    setIsDailyEmailEnabled(list?.contents?.enabled_daily_email);
-  }, [list]);
+    setNewName(list?.name)
+    setNewSearchTerm(list?.contents?.term)
+    setIsDailyEmailEnabled(list?.contents?.enabled_daily_email)
+  }, [list])
 
   const onClickSave = () => {
-    if (!list || !canSave) return;
+    if (!list || !canSave) return
 
     const newContents = {
       ...list.contents,
       term: newSearchTerm,
       enabled_daily_email: isDailyEmailEnabled,
-    };
+    }
     updateList({
       ...list,
       name: newName,
       contents: newContents,
     }).then(() => {
-      toastSuccessSavedSearchUpdate(newName);
-      onClose();
-    });
-    posthog.capture('user_save_list');
-  };
+      toastSuccessSavedSearchUpdate(newName)
+      onClose()
+    })
+    posthog.capture('user_save_list')
+  }
 
-  if (!list) return null;
+  if (!list) return null
 
-  const searchIntervalKey = Object.keys(Interval).find((key) => Interval[key] === list?.contents?.filters?.interval);
-  const searchInterval = searchIntervalKey ? Interval[searchIntervalKey] : undefined;
+  const searchIntervalKey = Object.keys(Interval).find((key) => Interval[key] === list?.contents?.filters?.interval)
+  const searchInterval = searchIntervalKey ? Interval[searchIntervalKey] : undefined
 
   return (
     <Modal open={open} setOpen={onClose} title="Manage Saved Search">
@@ -114,7 +114,7 @@ const ManageListModal = ({ open, onClose }) => {
         </div>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default ManageListModal;
+export default ManageListModal

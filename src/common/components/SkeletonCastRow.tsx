@@ -1,13 +1,13 @@
-import React from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 type SkeletonCastRowProps = {
-  text?: string;
-  className?: string;
-};
+  text?: string
+  className?: string
+}
 const SkeletonCastRow = ({ text, className }: SkeletonCastRowProps) => {
-  const randomDelay = Math.floor(Math.random() * 2000);
+  const randomDelay = Math.floor(Math.random() * 2000)
   return (
     <div className={cn('flex items-start mx-2 space-x-4', className)}>
       <Skeleton className="h-10 w-10 rounded-full" style={{ animationDelay: `${randomDelay + 100}ms` }} />
@@ -25,7 +25,7 @@ const SkeletonCastRow = ({ text, className }: SkeletonCastRowProps) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SkeletonCastRow;
+export default SkeletonCastRow

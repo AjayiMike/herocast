@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useAccount, useSwitchChain, useWalletClient } from 'wagmi';
+import React, { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useAccount, useSwitchChain, useWalletClient } from 'wagmi'
 import {
   getSignatureForUsernameProof,
   getTimestamp,
   setUserDataInProtocol,
   updateUsernameOffchain,
   validateUsernameIsAvailable,
-} from '../helpers/farcaster';
-import { getAddress } from 'viem';
-import { PENDING_ACCOUNT_NAME_PLACEHOLDER, hydrateAccounts, useAccountStore } from '@/stores/useAccountStore';
-import { AccountPlatformType } from '../constants/accounts';
-import { mainnet } from 'viem/chains';
-import { validations, UserDataType } from '@farcaster/hub-web';
-import { AccountSelector } from './AccountSelector';
-import { Cog6ToothIcon } from '@heroicons/react/20/solid';
+} from '../helpers/farcaster'
+import { getAddress } from 'viem'
+import { PENDING_ACCOUNT_NAME_PLACEHOLDER, hydrateAccounts, useAccountStore } from '@/stores/useAccountStore'
+import { AccountPlatformType } from '../constants/accounts'
+import { mainnet } from 'viem/chains'
+import { validations, UserDataType } from '@farcaster/hub-web'
+import { AccountSelector } from './AccountSelector'
+import { Cog6ToothIcon } from '@heroicons/react/20/solid'
 
-export type FarcasterAccountSetupFormValues = z.infer<typeof FarcasterAccountSetupFormSchema>;
+export type FarcasterAccountSetupFormValues = z.infer<typeof FarcasterAccountSetupFormSchema>
 
 const FarcasterAccountSetupFormSchema = z.object({
   username: z.string().min(5, {
@@ -55,81 +55,81 @@ const FarcasterAccountSetupFormSchema = z.object({
     ])
     .optional()
     .transform((e) => (e === '' ? undefined : e)),
-});
+})
 
 const RegisterFarcasterUsernameForm = ({
   onSuccess,
 }: {
-  onSuccess: (data: FarcasterAccountSetupFormValues) => void;
+  onSuccess: (data: FarcasterAccountSetupFormValues) => void
 }) => {
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>();
-  const { address, chainId, isConnected } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const [isPending, setIsPending] = useState(false)
+  const [error, setError] = useState<string | null>()
+  const { address, chainId, isConnected } = useAccount()
+  const { switchChainAsync } = useSwitchChain()
   const client = useWalletClient({
     account: address,
     chainId: mainnet.id,
-  })?.data;
+  })?.data
   const form = useForm<FarcasterAccountSetupFormValues>({
     resolver: zodResolver(FarcasterAccountSetupFormSchema),
     defaultValues: { username: '', displayName: '', bio: '' },
-  });
-  const { updateAccountUsername } = useAccountStore();
-  const account = useAccountStore((state) => state.accounts[state.selectedAccountIdx]);
-  const canSubmitForm = !isPending && isConnected && chainId === mainnet.id;
+  })
+  const { updateAccountUsername } = useAccountStore()
+  const account = useAccountStore((state) => state.accounts[state.selectedAccountIdx])
+  const canSubmitForm = !isPending && isConnected && chainId === mainnet.id
 
   const validateUsername = async (username: string): Promise<boolean> => {
-    const validationResults = validations.validateFname(username);
+    const validationResults = validations.validateFname(username)
     if (validationResults.isErr()) {
       form.setError('username', {
         type: 'manual',
         message: validationResults.error.message,
-      });
-      return false;
+      })
+      return false
     }
-    const isValidNewUsername = await validateUsernameIsAvailable(username);
+    const isValidNewUsername = await validateUsernameIsAvailable(username)
     if (!isValidNewUsername) {
       form.setError('username', {
         type: 'manual',
         message: 'Username is already taken',
-      });
+      })
     }
-    return isValidNewUsername;
-  };
+    return isValidNewUsername
+  }
 
   const registerFarcasterUsername = async (data: z.infer<typeof FarcasterAccountSetupFormSchema>) => {
-    console.log('registerFarcasterUsername', data);
+    console.log('registerFarcasterUsername', data)
 
     if (!address) {
       form.setError('username', {
         type: 'manual',
         message: 'Connect your wallet to continue',
-      });
-      return;
+      })
+      return
     }
-    if (!(await validateUsername(data.username))) return;
+    if (!(await validateUsername(data.username))) return
 
-    setIsPending(true);
-    setError(null);
+    setIsPending(true)
+    setError(null)
 
     try {
-      const owner = getAddress(address);
-      const { username, bio } = data;
+      const owner = getAddress(address)
+      const { username, bio } = data
 
-      let displayName = data.displayName;
+      let displayName = data.displayName
       if (!displayName) {
-        displayName = username;
+        displayName = username
       }
 
-      const timestamp = getTimestamp();
+      const timestamp = getTimestamp()
       const registerSignature = await getSignatureForUsernameProof(client, address, {
         name: username,
         owner,
         timestamp: BigInt(timestamp),
-      });
+      })
       if (!registerSignature) {
-        setIsPending(false);
-        throw new Error('Failed to get signature to register username');
+        setIsPending(false)
+        throw new Error('Failed to get signature to register username')
       }
 
       // todo: fix this can happen if account.getPlatformAccountId() is not set
@@ -143,37 +143,37 @@ const RegisterFarcasterUsernameForm = ({
         fid: account.platformAccountId!.toString(),
         username: username,
         signature: registerSignature,
-      });
-      console.log('updateUsername result', result);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      })
+      console.log('updateUsername result', result)
+      await new Promise((resolve) => setTimeout(resolve, 3000))
 
       await setUserDataInProtocol(
         account.privateKey!,
         Number(account.platformAccountId!),
         UserDataType.USERNAME,
         username
-      );
-      updateAccountUsername(account.id);
+      )
+      updateAccountUsername(account.id)
 
       await setUserDataInProtocol(
         account.privateKey!,
         Number(account.platformAccountId!),
         UserDataType.DISPLAY,
         displayName
-      );
+      )
 
       if (bio) {
-        await setUserDataInProtocol(account.privateKey!, Number(account.platformAccountId!), UserDataType.BIO, bio);
+        await setUserDataInProtocol(account.privateKey!, Number(account.platformAccountId!), UserDataType.BIO, bio)
       }
 
-      await hydrateAccounts();
-      onSuccess?.(data);
+      await hydrateAccounts()
+      onSuccess?.(data)
     } catch (e) {
-      console.error('Failed to register username', e);
-      setError('Failed to register username');
-      setIsPending(false);
+      console.error('Failed to register username', e)
+      setError('Failed to register username')
+      setIsPending(false)
     }
-  };
+  }
 
   const renderForm = () => (
     <Form {...form}>
@@ -238,7 +238,7 @@ const RegisterFarcasterUsernameForm = ({
         </div>
       </form>
     </Form>
-  );
+  )
 
   return (
     <div className="w-full space-y-4">
@@ -256,7 +256,7 @@ const RegisterFarcasterUsernameForm = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default RegisterFarcasterUsernameForm;
+export default RegisterFarcasterUsernameForm

@@ -1,31 +1,31 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import { CheckIcon, CaretSortIcon } from '@radix-ui/react-icons';
+import { CheckIcon, CaretSortIcon } from '@radix-ui/react-icons'
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
-import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { AccountObjectType, hydrateAccounts, useAccountStore } from '@/stores/useAccountStore';
-import { Label } from '@/components/ui/label';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { AccountObjectType, hydrateAccounts, useAccountStore } from '@/stores/useAccountStore'
+import { Label } from '@/components/ui/label'
 
 type AccountSelectorProps = {
-  className?: string;
-  accountFilter?: (account: AccountObjectType) => boolean;
-};
+  className?: string
+  accountFilter?: (account: AccountObjectType) => boolean
+}
 
 export function AccountSelector({ className, accountFilter }: AccountSelectorProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { selectedAccountIdx, setCurrentAccountById } = useAccountStore();
+  const [isLoading, setIsLoading] = useState(false)
+  const { selectedAccountIdx, setCurrentAccountById } = useAccountStore()
   const accounts = useAccountStore((state) => state.accounts).filter((account) =>
     accountFilter ? accountFilter(account) : true
-  );
+  )
 
-  const selectedAccount = useAccountStore((state) => state.accounts)[selectedAccountIdx];
-  const [open, setOpen] = useState(false);
+  const selectedAccount = useAccountStore((state) => state.accounts)[selectedAccountIdx]
+  const [open, setOpen] = useState(false)
 
   const renderRetryButton = () => (
     <>
@@ -36,9 +36,9 @@ export function AccountSelector({ className, accountFilter }: AccountSelectorPro
           className="w-20"
           disabled={isLoading}
           onClick={async () => {
-            setIsLoading(true);
-            await hydrateAccounts();
-            setIsLoading(false);
+            setIsLoading(true)
+            await hydrateAccounts()
+            setIsLoading(false)
           }}
         >
           {isLoading ? 'Loading...' : 'Retry'}
@@ -49,7 +49,7 @@ export function AccountSelector({ className, accountFilter }: AccountSelectorPro
         </Label>
       </div>
     </>
-  );
+  )
 
   const renderSelector = () => (
     <Popover open={open} onOpenChange={setOpen}>
@@ -86,8 +86,8 @@ export function AccountSelector({ className, accountFilter }: AccountSelectorPro
                   key={account.id}
                   value={account.id}
                   onSelect={async () => {
-                    setCurrentAccountById(account.id);
-                    setOpen(false);
+                    setCurrentAccountById(account.id)
+                    setOpen(false)
                   }}
                 >
                   <CheckIcon className={cn('mr-2 h-4 w-4', selectedAccountIdx === idx ? 'opacity-100' : 'opacity-0')} />
@@ -104,7 +104,7 @@ export function AccountSelector({ className, accountFilter }: AccountSelectorPro
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 
-  return accounts.length === 0 ? renderRetryButton() : renderSelector();
+  return accounts.length === 0 ? renderRetryButton() : renderSelector()
 }

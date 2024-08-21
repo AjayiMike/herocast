@@ -1,121 +1,121 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { create as mutativeCreate, Draft } from 'mutative';
-import { CastWithInteractions, User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { IcebreakerSocialInfo } from '@/common/helpers/icebreaker';
-import { AirstackSocialInfo } from '@/common/helpers/airstack';
-import { AnalyticsData } from '@/common/types/types';
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { create as mutativeCreate, Draft } from 'mutative'
+import { CastWithInteractions, User } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { IcebreakerSocialInfo } from '@/common/helpers/icebreaker'
+import { AirstackSocialInfo } from '@/common/helpers/airstack'
+import { AnalyticsData } from '@/common/types/types'
 
-export const PROFILE_UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
+export const PROFILE_UPDATE_INTERVAL = 1000 * 60 * 5 // 5 minutes
 
 type TokenInfo = {
-  imageUrl: string;
+  imageUrl: string
   websites: Array<{
-    label: string;
-    url: string;
-  }>;
-};
+    label: string
+    url: string
+  }>
+}
 
 type Token = {
-  address: string;
-  name: string;
-  symbol: string;
-};
+  address: string
+  name: string
+  symbol: string
+}
 
 type Transactions = {
   m5: {
-    buys: number;
-    sells: number;
-  };
+    buys: number
+    sells: number
+  }
   h1: {
-    buys: number;
-    sells: number;
-  };
+    buys: number
+    sells: number
+  }
   h6: {
-    buys: number;
-    sells: number;
-  };
+    buys: number
+    sells: number
+  }
   h24: {
-    buys: number;
-    sells: number;
-  };
-};
+    buys: number
+    sells: number
+  }
+}
 
 type Volume = {
-  h24: number;
-  h6: number;
-  h1: number;
-  m5: number;
-};
+  h24: number
+  h6: number
+  h1: number
+  m5: number
+}
 
 export type PriceChange = {
-  m5: number;
-  h1: number;
-  h6: number;
-  h24: number;
-};
+  m5: number
+  h1: number
+  h6: number
+  h24: number
+}
 
 type Liquidity = {
-  usd: number;
-  base: number;
-  quote: number;
-};
+  usd: number
+  base: number
+  quote: number
+}
 
 export type DexPair = {
-  chainId: string;
-  dexId: string;
-  url: string;
-  pairAddress: string;
-  baseToken: Token;
-  quoteToken: Token;
-  priceNative: string;
-  priceUsd: string;
-  txns: Transactions;
-  volume: Volume;
-  priceChange: PriceChange;
-  liquidity: Liquidity;
-  fdv: number;
-  pairCreatedAt: number;
-  info: TokenInfo;
-};
+  chainId: string
+  dexId: string
+  url: string
+  pairAddress: string
+  baseToken: Token
+  quoteToken: Token
+  priceNative: string
+  priceUsd: string
+  txns: Transactions
+  volume: Volume
+  priceChange: PriceChange
+  liquidity: Liquidity
+  fdv: number
+  pairCreatedAt: number
+  info: TokenInfo
+}
 
 type addTokenDataProps = {
-  tokenSymbol: string;
-  data: DexPair;
-};
+  tokenSymbol: string
+  data: DexPair
+}
 
 type AdditionalUserInfo = {
-  airstackSocialInfo: AirstackSocialInfo;
-  icebreakerSocialInfo: IcebreakerSocialInfo;
-};
+  airstackSocialInfo: AirstackSocialInfo
+  icebreakerSocialInfo: IcebreakerSocialInfo
+}
 
 type addUserProfileProps = {
-  user: User & Partial<AdditionalUserInfo>;
-};
+  user: User & Partial<AdditionalUserInfo>
+}
 
-export type UserProfile = User & { updatedAt: number } & Partial<AdditionalUserInfo>;
+export type UserProfile = User & { updatedAt: number } & Partial<AdditionalUserInfo>
 
 interface DataStoreProps {
-  selectedCast?: CastWithInteractions;
-  usernameToFid: Record<string, number>;
-  fidToData: Record<number, UserProfile>;
-  tokenSymbolToData: Record<string, DexPair>;
+  selectedCast?: CastWithInteractions
+  usernameToFid: Record<string, number>
+  fidToData: Record<number, UserProfile>
+  tokenSymbolToData: Record<string, DexPair>
 }
 
 interface DataStoreActions {
-  updateSelectedCast: (cast?: CastWithInteractions) => void;
-  addUserProfile: ({ user }: addUserProfileProps) => void;
-  addTokenData: ({ tokenSymbol, data }: addTokenDataProps) => void;
-  addAnalytics: (fid: number, analytics: AnalyticsData) => void;
+  updateSelectedCast: (cast?: CastWithInteractions) => void
+  addUserProfile: ({ user }: addUserProfileProps) => void
+  addTokenData: ({ tokenSymbol, data }: addTokenDataProps) => void
+  addAnalytics: (fid: number, analytics: AnalyticsData) => void
 }
 
 export interface DataStore extends DataStoreProps, DataStoreActions {}
 
-export const mutative = (config) => (set, get) => config((fn) => set(mutativeCreate(fn)), get);
+export const mutative = (config) => (set, get) => config((fn) => set(mutativeCreate(fn)), get)
 
-type StoreSet = (fn: (draft: Draft<DataStore>) => void) => void;
+type StoreSet = (fn: (draft: Draft<DataStore>) => void) => void
 
 const store = (set: StoreSet) => ({
   selectedCast: null,
@@ -124,30 +124,30 @@ const store = (set: StoreSet) => ({
   tokenSymbolToData: {},
   updateSelectedCast: (cast?: CastWithInteractions) => {
     set((state) => {
-      state.selectedCast = cast;
-    });
+      state.selectedCast = cast
+    })
   },
   addUserProfile: async ({ user }: addUserProfileProps) => {
     set((state) => {
       state.usernameToFid = {
         ...state.usernameToFid,
         ...{ [user.username]: user.fid },
-      };
+      }
       const userObject = {
         ...user,
         updatedAt: Date.now(),
-      };
-      state.fidToData = { ...state.fidToData, ...{ [user.fid]: userObject } };
-    });
+      }
+      state.fidToData = { ...state.fidToData, ...{ [user.fid]: userObject } }
+    })
   },
   addTokenData: ({ tokenSymbol, data }: addTokenDataProps) => {
     set((state) => {
       state.tokenSymbolToData = {
         ...state.tokenSymbolToData,
         ...{ [tokenSymbol]: data },
-      };
-    });
+      }
+    })
   },
-});
+})
 
-export const useDataStore = create<DataStore>()(devtools(mutative(store)));
+export const useDataStore = create<DataStore>()(devtools(mutative(store)))

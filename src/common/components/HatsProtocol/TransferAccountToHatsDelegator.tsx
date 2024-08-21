@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { useAccount, useReadContract, useSignTypedData } from 'wagmi';
-import { ID_REGISTRY_EIP_712_DOMAIN, ID_REGISTRY_TRANSFER_TYPE, idRegistryABI } from '@farcaster/hub-web';
-import { Cog6ToothIcon } from '@heroicons/react/20/solid';
-import { ID_REGISTRY_ADDRESS } from '@farcaster/hub-web';
-import { writeContract } from '@wagmi/core';
-import { config, publicClient } from '@/common/helpers/rainbowkit';
-import { encodePacked, hashTypedData, keccak256, toHex } from 'viem';
-import { useWaitForTransactionReceipt } from 'wagmi';
-import { getDeadline, getFidForAddress } from '@/common/helpers/farcaster';
-import { HatsFarcasterDelegatorAbi } from '@/common/constants/contracts/HatsFarcasterDelegator';
-import { openWindow } from '../../helpers/navigation';
-import { SIGNED_KEY_REQUEST_TYPEHASH, isValidSignature, isValidSigner } from '@/lib/hats';
-import { waitForTransactionReceipt } from '@wagmi/core';
-import SwitchWalletButton from '../SwitchWalletButton';
-import { Label } from '@/components/ui/label';
-import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { optimism } from 'viem/chains';
+import React, { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { useAccount, useReadContract, useSignTypedData } from 'wagmi'
+import { ID_REGISTRY_EIP_712_DOMAIN, ID_REGISTRY_TRANSFER_TYPE, idRegistryABI } from '@farcaster/hub-web'
+import { Cog6ToothIcon } from '@heroicons/react/20/solid'
+import { ID_REGISTRY_ADDRESS } from '@farcaster/hub-web'
+import { writeContract } from '@wagmi/core'
+import { config, publicClient } from '@/common/helpers/rainbowkit'
+import { encodePacked, hashTypedData, keccak256, toHex } from 'viem'
+import { useWaitForTransactionReceipt } from 'wagmi'
+import { getDeadline, getFidForAddress } from '@/common/helpers/farcaster'
+import { HatsFarcasterDelegatorAbi } from '@/common/constants/contracts/HatsFarcasterDelegator'
+import { openWindow } from '../../helpers/navigation'
+import { SIGNED_KEY_REQUEST_TYPEHASH, isValidSignature, isValidSigner } from '@/lib/hats'
+import { waitForTransactionReceipt } from '@wagmi/core'
+import SwitchWalletButton from '../SwitchWalletButton'
+import { Label } from '@/components/ui/label'
+import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { optimism } from 'viem/chains'
 
 const readNonces = async (account: `0x${string}`) => {
-  if (!account) return BigInt(0);
+  if (!account) return BigInt(0)
 
   return await publicClient.readContract({
     address: ID_REGISTRY_ADDRESS,
     abi: idRegistryABI,
     functionName: 'nonces',
     args: [account],
-  });
-};
+  })
+}
 
 enum TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS {
   'CONNECT_WALLET',
@@ -42,11 +42,11 @@ enum TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS {
 }
 
 type TransferAccountToHatsDelegatorStepType = {
-  state: TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS;
-  title: string;
-  description: string;
-  idx: number;
-};
+  state: TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS
+  title: string
+  description: string
+  idx: number
+}
 
 const TransferAccountToHatsDelegatorSteps: TransferAccountToHatsDelegatorStepType[] = [
   {
@@ -104,43 +104,43 @@ const TransferAccountToHatsDelegatorSteps: TransferAccountToHatsDelegatorStepTyp
     description: 'Something went wrong',
     idx: 8,
   },
-];
+]
 
 const TransferAccountToHatsDelegator = ({
   toAddress,
   onSuccess,
   user,
 }: {
-  user: User;
-  toAddress: `0x${string}`;
-  onSuccess: () => void;
+  user: User
+  toAddress: `0x${string}`
+  onSuccess: () => void
 }) => {
-  const { address, isConnected } = useAccount();
-  const [step, setStep] = useState<TransferAccountToHatsDelegatorStepType>(TransferAccountToHatsDelegatorSteps[0]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [signature, setSignature] = useState<`0x${string}`>('0x');
-  const [deadline, setDeadline] = useState<bigint>(BigInt(0));
-  const [nonce, setNonce] = useState<bigint>(BigInt(0));
-  const [onchainTransactionHash, setOnchainTransactionHash] = useState<`0x${string}`>('0x');
+  const { address, isConnected } = useAccount()
+  const [step, setStep] = useState<TransferAccountToHatsDelegatorStepType>(TransferAccountToHatsDelegatorSteps[0])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [signature, setSignature] = useState<`0x${string}`>('0x')
+  const [deadline, setDeadline] = useState<bigint>(BigInt(0))
+  const [nonce, setNonce] = useState<bigint>(BigInt(0))
+  const [onchainTransactionHash, setOnchainTransactionHash] = useState<`0x${string}`>('0x')
 
-  const { signTypedDataAsync } = useSignTypedData();
-  const fid = BigInt(user.fid);
-  const [connectedAddressOwnsFarcasterAccount, setConnectedAddressOwnsFarcasterAccount] = useState<boolean>(false);
+  const { signTypedDataAsync } = useSignTypedData()
+  const fid = BigInt(user.fid)
+  const [connectedAddressOwnsFarcasterAccount, setConnectedAddressOwnsFarcasterAccount] = useState<boolean>(false)
 
   useEffect(() => {
     const checkOwnership = async (address: `0x${string}`) => {
-      const ownsAccount = fid === (await getFidForAddress(address));
-      setConnectedAddressOwnsFarcasterAccount(ownsAccount);
-    };
+      const ownsAccount = fid === (await getFidForAddress(address))
+      setConnectedAddressOwnsFarcasterAccount(ownsAccount)
+    }
 
     if (address) {
-      checkOwnership(address);
+      checkOwnership(address)
     }
-  }, [address, fid]);
+  }, [address, fid])
 
   const transactionResult = useWaitForTransactionReceipt({
     hash: onchainTransactionHash,
-  });
+  })
 
   const {
     data: isFidReceivable,
@@ -152,54 +152,54 @@ const TransferAccountToHatsDelegator = ({
     chainId: optimism.id,
     functionName: toAddress ? 'receivable' : undefined,
     args: toAddress ? [fid] : undefined,
-  });
+  })
 
   useEffect(() => {
     if (
       step.state === TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_PREPARE_TO_RECEIVE_CONFIRMATION &&
       isFidReceivable
     ) {
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.GENERATE_SIGNATURE);
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.GENERATE_SIGNATURE)
     }
-  }, [isFidReceivable, status, step]);
+  }, [isFidReceivable, status, step])
 
   const setStepToKey = (key: TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS) => {
-    const newStep = TransferAccountToHatsDelegatorSteps.find((step) => step.state === key);
-    if (newStep) setStep(newStep);
-  };
+    const newStep = TransferAccountToHatsDelegatorSteps.find((step) => step.state === key)
+    if (newStep) setStep(newStep)
+  }
 
   useEffect(() => {
     if (address && !fid) {
-      setErrorMessage('FID is required');
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
+      setErrorMessage('FID is required')
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
     } else if (!toAddress) {
-      setErrorMessage('To address is required');
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
+      setErrorMessage('To address is required')
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
     } else if (errorMessage) {
-      setErrorMessage('');
+      setErrorMessage('')
     }
-  }, [fid, address, toAddress]);
+  }, [fid, address, toAddress])
 
   useEffect(() => {
     const setup = async () => {
-      const newNonce = await readNonces(toAddress);
-      setNonce(newNonce);
-      const newDeadline = getDeadline();
-      setDeadline(newDeadline);
-      console.log(`setup done -> deadline: ${newDeadline} toAddress: ${toAddress}`);
-    };
+      const newNonce = await readNonces(toAddress)
+      setNonce(newNonce)
+      const newDeadline = getDeadline()
+      setDeadline(newDeadline)
+      console.log(`setup done -> deadline: ${newDeadline} toAddress: ${toAddress}`)
+    }
 
-    setup();
-  }, [toAddress]);
+    setup()
+  }, [toAddress])
 
   useEffect(() => {
-    if (onchainTransactionHash === '0x') return;
+    if (onchainTransactionHash === '0x') return
 
     if (transactionResult) {
-      console.log('transactionResult', transactionResult?.data);
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONFIRMED);
+      console.log('transactionResult', transactionResult?.data)
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONFIRMED)
     }
-  }, [onchainTransactionHash, transactionResult]);
+  }, [onchainTransactionHash, transactionResult])
 
   const onExecutePrepareToReceive = async () => {
     try {
@@ -208,17 +208,17 @@ const TransferAccountToHatsDelegator = ({
         address: toAddress,
         functionName: 'prepareToReceive',
         args: [fid],
-      });
+      })
 
-      const result = await waitForTransactionReceipt(config, { hash: tx });
-      setStep(TransferAccountToHatsDelegatorSteps[2]);
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_PREPARE_TO_RECEIVE_CONFIRMATION);
+      const result = await waitForTransactionReceipt(config, { hash: tx })
+      setStep(TransferAccountToHatsDelegatorSteps[2])
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_PREPARE_TO_RECEIVE_CONFIRMATION)
     } catch (e) {
-      console.error('onExecutePrepareToReceive error', e);
-      setErrorMessage(e?.message || e);
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
+      console.error('onExecutePrepareToReceive error', e)
+      setErrorMessage(e?.message || e)
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
     }
-  };
+  }
 
   const getTransferTypeData = () => ({
     domain: ID_REGISTRY_EIP_712_DOMAIN,
@@ -232,50 +232,50 @@ const TransferAccountToHatsDelegator = ({
       nonce: nonce,
       deadline: BigInt(deadline),
     },
-  });
+  })
 
   const onSignData = async () => {
-    if (!address) return;
+    if (!address) return
 
-    const hasConnectedValidSignerAddress = await isValidSigner(toAddress, SIGNED_KEY_REQUEST_TYPEHASH, address);
+    const hasConnectedValidSignerAddress = await isValidSigner(toAddress, SIGNED_KEY_REQUEST_TYPEHASH, address)
 
     if (!hasConnectedValidSignerAddress) {
       setErrorMessage(
         "Your wallet isn't allowed to sign messages for the delegator contract - the admin wallet address / admin hat wearer must sign the transaction."
-      );
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
-      return;
+      )
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
+      return
     }
 
-    const typedData = getTransferTypeData();
-    const newSignature = await signTypedDataAsync(typedData);
+    const typedData = getTransferTypeData()
+    const newSignature = await signTypedDataAsync(typedData)
     if (!newSignature) {
-      setErrorMessage('Error generating signature');
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
-      return;
+      setErrorMessage('Error generating signature')
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
+      return
     }
 
-    setSignature(newSignature);
-    setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_ONCHAIN);
-  };
+    setSignature(newSignature)
+    setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_ONCHAIN)
+  }
 
   const onExecuteTransfer = async () => {
-    if (!address || signature === '0x' || !fid) return;
+    if (!address || signature === '0x' || !fid) return
 
-    const typeHash = keccak256(toHex('Transfer(uint256 fid,address to,uint256 nonce,uint256 deadline)'));
+    const typeHash = keccak256(toHex('Transfer(uint256 fid,address to,uint256 nonce,uint256 deadline)'))
     const sig = encodePacked(
       ['bytes', 'bytes32', 'uint256', 'address', 'uint256', 'uint256'],
       [signature, typeHash, BigInt(fid), toAddress, nonce, BigInt(deadline)]
-    );
+    )
 
     try {
-      const hash = hashTypedData(getTransferTypeData());
-      const isValidSig = await isValidSignature(toAddress, hash, sig);
-      console.log('isValidSig', isValidSig);
+      const hash = hashTypedData(getTransferTypeData())
+      const isValidSig = await isValidSignature(toAddress, hash, sig)
+      console.log('isValidSig', isValidSig)
     } catch (e) {
-      console.log('failed something', e);
-      setErrorMessage(`Error validating signature: ${e}`);
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
+      console.log('failed something', e)
+      setErrorMessage(`Error validating signature: ${e}`)
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
     }
 
     try {
@@ -284,29 +284,29 @@ const TransferAccountToHatsDelegator = ({
         address: ID_REGISTRY_ADDRESS,
         functionName: 'transfer',
         args: [toAddress, BigInt(deadline), sig],
-      });
-      console.log('result', tx);
-      setOnchainTransactionHash(tx);
+      })
+      console.log('result', tx)
+      setOnchainTransactionHash(tx)
 
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_ONCHAIN_CONFIRMATION);
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_ONCHAIN_CONFIRMATION)
     } catch (e) {
       if ('User rejected the request' in e) {
-        setErrorMessage('User rejected the request');
+        setErrorMessage('User rejected the request')
       } else {
-        setErrorMessage(e?.message || e);
+        setErrorMessage(e?.message || e)
       }
-      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR);
+      setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR)
     }
-  };
+  }
 
   const getButtonLabel = () => {
     switch (step.state) {
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONNECT_WALLET:
-        return 'Connect wallet';
+        return 'Connect wallet'
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_PREPARE_TO_RECEIVE:
-        return 'Prepare for transfer';
+        return 'Prepare for transfer'
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.GENERATE_SIGNATURE:
-        return `Generate signature`;
+        return `Generate signature`
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_PREPARE_TO_RECEIVE_CONFIRMATION:
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_SIGNATURE_CONFIRMATION:
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_ONCHAIN_CONFIRMATION:
@@ -314,51 +314,51 @@ const TransferAccountToHatsDelegator = ({
           <p className="flex text-muted">
             <Cog6ToothIcon className="h-5 w-5 animate-spin" aria-hidden="true" />
           </p>
-        );
+        )
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_ONCHAIN:
-        return 'Execute onchain transfer';
+        return 'Execute onchain transfer'
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONFIRMED:
-        return 'Continue';
+        return 'Continue'
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR:
-        return 'Error - Try again';
+        return 'Error - Try again'
     }
-  };
+  }
 
   useEffect(() => {
     if (step.state === TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONNECT_WALLET && address) {
-      setStep(TransferAccountToHatsDelegatorSteps[1]);
+      setStep(TransferAccountToHatsDelegatorSteps[1])
     }
-  }, [address]);
+  }, [address])
 
   const onClick = () => {
     switch (step.state) {
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_PREPARE_TO_RECEIVE:
-        onExecutePrepareToReceive();
-        break;
+        onExecutePrepareToReceive()
+        break
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.GENERATE_SIGNATURE:
-        if (!address) return;
+        if (!address) return
 
-        setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_SIGNATURE_CONFIRMATION);
-        onSignData();
-        break;
+        setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_SIGNATURE_CONFIRMATION)
+        onSignData()
+        break
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_SIGNATURE_CONFIRMATION:
-        break;
+        break
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_ONCHAIN:
-        onExecuteTransfer();
-        break;
+        onExecuteTransfer()
+        break
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_ONCHAIN_CONFIRMATION:
-        break;
+        break
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONFIRMED:
-        onSuccess();
-        break;
+        onSuccess()
+        break
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.ERROR:
-        setErrorMessage('');
-        setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_PREPARE_TO_RECEIVE);
-        break;
+        setErrorMessage('')
+        setStepToKey(TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_PREPARE_TO_RECEIVE)
+        break
       default:
-        break;
+        break
     }
-  };
+  }
 
   const getCardContent = () => {
     switch (step.state) {
@@ -388,7 +388,7 @@ const TransferAccountToHatsDelegator = ({
               <Label className="mt-2">Skip if you already prepared the contract.</Label>
             </div>
           </>
-        );
+        )
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.GENERATE_SIGNATURE:
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.EXECUTE_ONCHAIN:
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.PENDING_SIGNATURE_CONFIRMATION:
@@ -415,7 +415,7 @@ const TransferAccountToHatsDelegator = ({
               </p>
             </div>
           </div>
-        );
+        )
       case TRANSFER_ACCOUNT_TO_HATS_DELEGATOR_STEPS.CONFIRMED:
         return (
           <div className="flex flex-col text-foreground">
@@ -428,11 +428,11 @@ const TransferAccountToHatsDelegator = ({
               See transaction on Etherscan ↗️
             </Button>
           </div>
-        );
+        )
       default:
-        return <></>;
+        return <></>
     }
-  };
+  }
 
   return (
     <div className="flex flex-col w-2/3 space-y-4">
@@ -468,7 +468,7 @@ const TransferAccountToHatsDelegator = ({
         {getButtonLabel()}
       </Button>
     </div>
-  );
-};
+  )
+}
 
-export default TransferAccountToHatsDelegator;
+export default TransferAccountToHatsDelegator

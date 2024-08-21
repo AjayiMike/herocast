@@ -1,15 +1,15 @@
 // needs to be wrapped in <Tooltip.Provider delayDuration={50} skipDelayDuration={0}>
-import React from 'react';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import React from 'react'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 type HotkeyTooltipWrapperProps = {
-  hotkey?: string | React.ReactNode;
-  side: 'top' | 'right' | 'bottom' | 'left';
-  children: React.ReactNode;
-};
+  hotkey?: string | React.ReactNode
+  side: 'top' | 'right' | 'bottom' | 'left'
+  children: React.ReactNode
+}
 
 const HotkeyTooltipWrapper = ({ hotkey, side, children }: HotkeyTooltipWrapperProps) => {
-  if (!hotkey) return children;
+  if (!hotkey) return children
 
   return (
     <Tooltip>
@@ -23,7 +23,7 @@ const HotkeyTooltipWrapper = ({ hotkey, side, children }: HotkeyTooltipWrapperPr
         {hotkey}
       </TooltipContent>
     </Tooltip>
-  );
-};
+  )
+}
 
-export default HotkeyTooltipWrapper;
+export default HotkeyTooltipWrapper

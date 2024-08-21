@@ -1,4 +1,4 @@
-import { Properties } from 'csstype';
+import { Properties } from 'csstype'
 
 export const castTextStyle = {
   whiteSpace: 'pre-wrap',
@@ -18,4 +18,4 @@ export const castTextStyle = {
   MozHyphens: 'auto',
   WebkitHyphens: 'auto',
   hyphens: 'auto',
-} as Properties<string | number, string & any>;
+} as Properties<string | number, string & any>

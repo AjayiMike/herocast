@@ -1,6 +1,6 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { ArrowUpCircleIcon, Cog6ToothIcon, PencilSquareIcon, UserIcon } from '@heroicons/react/20/solid';
+import React, { Fragment, useEffect, useState } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { ArrowUpCircleIcon, Cog6ToothIcon, PencilSquareIcon, UserIcon } from '@heroicons/react/20/solid'
 import {
   Bars3Icon,
   UserPlusIcon,
@@ -8,59 +8,59 @@ import {
   MagnifyingGlassIcon,
   NewspaperIcon,
   RectangleGroupIcon,
-} from '@heroicons/react/24/solid';
-import { useRouter } from 'next/router';
-import Image from 'next/image';
-import { RIGHT_SIDEBAR_ENUM } from '../common/constants/navigation';
-import RightSidebar from '@/common/components/Sidebar/RightSidebar';
-import ChannelsRightSidebar from '@/common/components/Sidebar/ChannelsRightSidebar';
-import { CUSTOM_CHANNELS, useAccountStore } from '@/stores/useAccountStore';
-import { ThemeToggle } from '@/common/components/ThemeToggle';
-import { Toaster } from '@/components/ui/sonner';
-import AccountSwitcher from '@/common/components/Sidebar/AccountSwitcher';
-import { cn } from '@/lib/utils';
-import { Loading } from '@/common/components/Loading';
-import useInitializeStores from '@/common/hooks/useInitializeStores';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AccountPlatformType } from '@/common/constants/accounts';
-import NewCastModal from '@/common/components/NewCastModal';
-import { CastModalView, useNavigationStore } from '@/stores/useNavigationStore';
-import { useDraftStore } from '@/stores/useDraftStore';
-import Link from 'next/link';
-import { ChartBarIcon } from '@heroicons/react/20/solid';
-import PublishedCastsRightSidebar from '@/common/components/Sidebar/PublishedCastsRightSidebar';
-import { useListStore } from '@/stores/useListStore';
+} from '@heroicons/react/24/solid'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
+import { RIGHT_SIDEBAR_ENUM } from '../common/constants/navigation'
+import RightSidebar from '@/common/components/Sidebar/RightSidebar'
+import ChannelsRightSidebar from '@/common/components/Sidebar/ChannelsRightSidebar'
+import { CUSTOM_CHANNELS, useAccountStore } from '@/stores/useAccountStore'
+import { ThemeToggle } from '@/common/components/ThemeToggle'
+import { Toaster } from '@/components/ui/sonner'
+import AccountSwitcher from '@/common/components/Sidebar/AccountSwitcher'
+import { cn } from '@/lib/utils'
+import { Loading } from '@/common/components/Loading'
+import useInitializeStores from '@/common/hooks/useInitializeStores'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { AccountPlatformType } from '@/common/constants/accounts'
+import NewCastModal from '@/common/components/NewCastModal'
+import { CastModalView, useNavigationStore } from '@/stores/useNavigationStore'
+import { useDraftStore } from '@/stores/useDraftStore'
+import Link from 'next/link'
+import { ChartBarIcon } from '@heroicons/react/20/solid'
+import PublishedCastsRightSidebar from '@/common/components/Sidebar/PublishedCastsRightSidebar'
+import { useListStore } from '@/stores/useListStore'
 
 type NavigationGroupType = {
-  name: string;
-  items: NavigationItemType[];
-};
+  name: string
+  items: NavigationItemType[]
+}
 
 type NavigationItemType = {
-  name: string;
-  router: string;
-  icon?: any;
-  getTitle?: () => string | JSX.Element;
-  getHeaderActions?: () => HeaderAction[];
-  shortcut?: string;
-  additionalPaths?: string[];
-  hide?: boolean;
-};
+  name: string
+  router: string
+  icon?: any
+  getTitle?: () => string | JSX.Element
+  getHeaderActions?: () => HeaderAction[]
+  shortcut?: string
+  additionalPaths?: string[]
+  hide?: boolean
+}
 
 type HeaderAction = {
-  name: string | JSX.Element;
-  onClick: () => void;
-};
+  name: string | JSX.Element
+  onClick: () => void
+}
 
 const Home = ({ children }: { children: React.ReactNode }) => {
-  useInitializeStores();
+  useInitializeStores()
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const { asPath, pathname } = router;
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { allChannels, selectedChannelUrl, isHydrated, addPinnedChannel, removePinnedChannel } = useAccountStore();
+  const { asPath, pathname } = router
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { allChannels, selectedChannelUrl, isHydrated, addPinnedChannel, removePinnedChannel } = useAccountStore()
   const {
     castModalDraftId,
     isNewCastModalOpen,
@@ -68,52 +68,52 @@ const Home = ({ children }: { children: React.ReactNode }) => {
     closeNewCastModal,
     setCastModalView,
     setCastModalDraftId,
-  } = useNavigationStore();
-  const selectedList = useListStore((state) => state.lists.find((l) => l.id === state.selectedListId));
-  const { addNewPostDraft } = useDraftStore();
-  const channels = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels || []);
+  } = useNavigationStore()
+  const selectedList = useListStore((state) => state.lists.find((l) => l.id === state.selectedListId))
+  const { addNewPostDraft } = useDraftStore()
+  const channels = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels || [])
   const pageRequiresHydrate =
     asPath !== '/login' &&
     !asPath.startsWith('/profile') &&
     !asPath.startsWith('/conversation') &&
-    !asPath.startsWith('/analytics');
+    !asPath.startsWith('/analytics')
 
   const isReadOnlyUser = useAccountStore(
     (state) =>
       state.accounts.length === 1 && state.accounts[0].platform === AccountPlatformType.farcaster_local_readonly
-  );
+  )
 
   const loadingMessages = [
     'Preparing your Farcaster experience',
     'Loading herocast',
     "You haven't been here for a while, welcome back!",
-  ];
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  ]
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
 
   useEffect(() => {
     if (!isHydrated) {
       const interval = setInterval(() => {
-        setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
-      }, 3000); // Change message every 3 seconds
+        setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length)
+      }, 3000) // Change message every 3 seconds
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [isHydrated]);
+  }, [isHydrated])
 
   const getFeedTitle = () => {
     if (selectedList) {
-      return selectedList.name;
+      return selectedList.name
     }
     if (selectedChannelUrl === CUSTOM_CHANNELS.FOLLOWING.toString()) {
-      return 'Following Feed';
+      return 'Following Feed'
     }
     if (selectedChannelUrl === CUSTOM_CHANNELS.TRENDING.toString()) {
-      return 'Trending Feed';
+      return 'Trending Feed'
     }
 
-    const selectedChannelIdx = allChannels?.findIndex((channel) => channel.url === selectedChannelUrl);
+    const selectedChannelIdx = allChannels?.findIndex((channel) => channel.url === selectedChannelUrl)
     if (selectedChannelIdx !== -1) {
-      const channel = allChannels[selectedChannelIdx];
+      const channel = allChannels[selectedChannelIdx]
       return (
         <div className="flex max-w-sm items-center">
           {channel.icon_url && (
@@ -127,10 +127,10 @@ const Home = ({ children }: { children: React.ReactNode }) => {
           )}
           <span className="max-w-xs flex truncate">{channel.name} channel</span>
         </div>
-      );
+      )
     }
-    return 'Feed';
-  };
+    return 'Feed'
+  }
 
   const navigationGroups: NavigationGroupType[] = [
     {
@@ -142,46 +142,46 @@ const Home = ({ children }: { children: React.ReactNode }) => {
           icon: <NewspaperIcon className="h-6 w-6 shrink-0" aria-hidden="true" />,
           getTitle: getFeedTitle,
           getHeaderActions: () => {
-            const isChannelPinned = channels.findIndex((channel) => channel.url === selectedChannelUrl) !== -1;
+            const isChannelPinned = channels.findIndex((channel) => channel.url === selectedChannelUrl) !== -1
             const isChannelFeed =
               selectedChannelUrl !== CUSTOM_CHANNELS.FOLLOWING &&
               selectedChannelUrl !== CUSTOM_CHANNELS.TRENDING &&
-              !selectedList;
+              !selectedList
             const actions = [
               {
                 name: 'Cast',
                 onClick: () => {
-                  let parentUrl;
+                  let parentUrl
                   if (isChannelFeed) {
-                    parentUrl = selectedChannelUrl;
+                    parentUrl = selectedChannelUrl
                   }
-                  setCastModalView(CastModalView.New);
+                  setCastModalView(CastModalView.New)
                   addNewPostDraft({
                     parentUrl,
                     onSuccess(draftId) {
-                      setCastModalDraftId(draftId);
-                      openNewCastModal();
+                      setCastModalDraftId(draftId)
+                      openNewCastModal()
                     },
-                  });
+                  })
                 },
               },
-            ];
+            ]
             if (isChannelFeed) {
               actions.push({
                 name: isChannelPinned ? 'Unpin' : 'Pin',
                 onClick: () => {
-                  const channel = channels.find((c) => c.url === selectedChannelUrl);
-                  if (!channel) return;
+                  const channel = channels.find((c) => c.url === selectedChannelUrl)
+                  if (!channel) return
 
                   if (isChannelPinned) {
-                    removePinnedChannel(channel);
+                    removePinnedChannel(channel)
                   } else {
-                    addPinnedChannel(channel);
+                    addPinnedChannel(channel)
                   }
                 },
-              });
+              })
             }
-            return actions;
+            return actions
           },
           shortcut: 'Shift + F',
           additionalPaths: ['/conversation/[...slug]'],
@@ -258,71 +258,71 @@ const Home = ({ children }: { children: React.ReactNode }) => {
         },
       ],
     },
-  ];
+  ]
 
   const getSidebarForPathname = (pathname: string): RIGHT_SIDEBAR_ENUM => {
     switch (pathname) {
       case '/feeds':
-        return RIGHT_SIDEBAR_ENUM.CAST_INFO_AND_CHANNEL_SELECTOR;
+        return RIGHT_SIDEBAR_ENUM.CAST_INFO_AND_CHANNEL_SELECTOR
       case '/post':
-        return RIGHT_SIDEBAR_ENUM.PUBLISHED_CASTS;
+        return RIGHT_SIDEBAR_ENUM.PUBLISHED_CASTS
       case '/channels':
-        return RIGHT_SIDEBAR_ENUM.NONE;
+        return RIGHT_SIDEBAR_ENUM.NONE
       case '/notifications':
-        return RIGHT_SIDEBAR_ENUM.CAST_INFO;
+        return RIGHT_SIDEBAR_ENUM.CAST_INFO
       case '/search':
-        return RIGHT_SIDEBAR_ENUM.SEARCH;
+        return RIGHT_SIDEBAR_ENUM.SEARCH
       case '/profile/[slug]':
       case '/conversation/[...slug]':
-        return RIGHT_SIDEBAR_ENUM.CAST_INFO;
+        return RIGHT_SIDEBAR_ENUM.CAST_INFO
       default:
-        return RIGHT_SIDEBAR_ENUM.NONE;
+        return RIGHT_SIDEBAR_ENUM.NONE
     }
-  };
+  }
 
   const getTitle = (navItem) => {
     if (navItem) {
-      return navItem.getTitle ? navItem.getTitle() : navItem.name;
+      return navItem.getTitle ? navItem.getTitle() : navItem.name
     } else {
       if (pathname === '/profile/[slug]') {
-        return 'Profile';
+        return 'Profile'
       } else if (pathname === '/conversation/[...slug]') {
-        return 'Conversation';
+        return 'Conversation'
       }
     }
-  };
+  }
 
   const getHeaderActions = (navItem) => {
-    return navItem?.getHeaderActions ? navItem.getHeaderActions() : [];
-  };
+    return navItem?.getHeaderActions ? navItem.getHeaderActions() : []
+  }
 
   const getNavItem = (pathname: string) => {
     return navigationGroups
       .map((group) => group.items)
       .flat()
-      .find((item) => item.router === pathname);
-  };
+      .find((item) => item.router === pathname)
+  }
 
-  const navItem = getNavItem(pathname);
-  const title = getTitle(navItem);
-  const headerActions = getHeaderActions(navItem);
-  const sidebarType = getSidebarForPathname(pathname);
+  const navItem = getNavItem(pathname)
+  const title = getTitle(navItem)
+  const headerActions = getHeaderActions(navItem)
+  const sidebarType = getSidebarForPathname(pathname)
 
   const renderRightSidebar = () => {
     switch (sidebarType) {
       case RIGHT_SIDEBAR_ENUM.CAST_INFO_AND_CHANNEL_SELECTOR:
-        return <RightSidebar showFeeds showLists showAuthorInfo />;
+        return <RightSidebar showFeeds showLists showAuthorInfo />
       case RIGHT_SIDEBAR_ENUM.CAST_INFO:
-        return <RightSidebar showAuthorInfo />;
+        return <RightSidebar showAuthorInfo />
       case RIGHT_SIDEBAR_ENUM.PUBLISHED_CASTS:
-        return <PublishedCastsRightSidebar />;
+        return <PublishedCastsRightSidebar />
       case RIGHT_SIDEBAR_ENUM.SEARCH:
-        return <RightSidebar showManageLists showSearches showAuthorInfo />;
+        return <RightSidebar showManageLists showSearches showAuthorInfo />
       case RIGHT_SIDEBAR_ENUM.NONE:
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   const renderUpgradeCard = () => (
     <Card>
@@ -338,10 +338,10 @@ const Home = ({ children }: { children: React.ReactNode }) => {
         </Link>
       </CardContent>
     </Card>
-  );
+  )
 
   if (pathname === '/login') {
-    return children;
+    return children
   }
 
   const renderNewCastModal = () =>
@@ -351,7 +351,7 @@ const Home = ({ children }: { children: React.ReactNode }) => {
         open={isNewCastModalOpen}
         setOpen={(isOpen) => (isOpen ? openNewCastModal() : closeNewCastModal())}
       />
-    );
+    )
 
   return (
     <div className="h-full bg-background">
@@ -384,7 +384,7 @@ const Home = ({ children }: { children: React.ReactNode }) => {
                 <div className="mt-16 z-100 flex grow flex-col gap-y-5 overflow-y-auto bg-background px-6 ring-1 ring-gray-700/10">
                   <nav className="flex flex-1 flex-col divide-y divide-muted-foreground/20">
                     {navigationGroups.map((group) => {
-                      const navigation = group.items;
+                      const navigation = group.items
                       return (
                         <div key={`nav-group-mobile-${group.name}`}>
                           <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -414,7 +414,7 @@ const Home = ({ children }: { children: React.ReactNode }) => {
                             </li>
                           </ul>
                         </div>
-                      );
+                      )
                     })}
                     <div className="w-full flex flex-row py-4">
                       <AccountSwitcher />
@@ -440,7 +440,7 @@ const Home = ({ children }: { children: React.ReactNode }) => {
               <div className="flex flex-col justify-between">
                 <nav className="mt-0 divide-y divide-muted-foreground/20">
                   {navigationGroups.map((group) => {
-                    const navigation = group.items;
+                    const navigation = group.items
                     return (
                       <div key={`nav-group-${group.name}`}>
                         {navigation.map(
@@ -470,7 +470,7 @@ const Home = ({ children }: { children: React.ReactNode }) => {
                             )
                         )}
                       </div>
-                    );
+                    )
                   })}
                 </nav>
               </div>
@@ -520,7 +520,7 @@ const Home = ({ children }: { children: React.ReactNode }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

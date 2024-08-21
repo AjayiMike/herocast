@@ -1,11 +1,11 @@
-import React from 'react';
-import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Button } from '@/components/ui/button';
+import React from 'react'
+import * as AlertDialog from '@radix-ui/react-alert-dialog'
+import { Button } from '@/components/ui/button'
 
 type AlertDialogProps = {
-  buttonText: string;
-  onClick: () => void;
-};
+  buttonText: string
+  onClick: () => void
+}
 
 const AlertDialogDemo = ({ buttonText, onClick }: AlertDialogProps) => (
   <AlertDialog.Root>
@@ -34,6 +34,6 @@ const AlertDialogDemo = ({ buttonText, onClick }: AlertDialogProps) => (
       </AlertDialog.Content>
     </AlertDialog.Portal>
   </AlertDialog.Root>
-);
+)
 
-export default AlertDialogDemo;
+export default AlertDialogDemo

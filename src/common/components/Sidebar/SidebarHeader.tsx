@@ -1,13 +1,13 @@
-import React from 'react';
+import React from 'react'
 
 export const SidebarHeader = ({
   title,
   actionTitle,
   onClick,
 }: {
-  title: string | JSX.Element;
-  actionTitle?: string;
-  onClick?: () => void;
+  title: string | JSX.Element
+  actionTitle?: string
+  onClick?: () => void
 }) => {
   return (
     <div className="bg-muted/50 flex items-center justify-between border-l border-muted/10 px-4 py-3 sm:px-4 sm:py-3">
@@ -21,5 +21,5 @@ export const SidebarHeader = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

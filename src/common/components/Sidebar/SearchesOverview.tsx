@@ -1,14 +1,14 @@
-import React from 'react';
-import { SidebarHeader } from './SidebarHeader';
-import { Badge } from '@/components/ui/badge';
-import { Search, useListStore } from '@/stores/useListStore';
-import { take } from 'lodash';
-import sortBy from 'lodash.sortby';
-import { isDev } from '@/common/helpers/env';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { SidebarHeader } from './SidebarHeader'
+import { Badge } from '@/components/ui/badge'
+import { Search, useListStore } from '@/stores/useListStore'
+import { take } from 'lodash'
+import sortBy from 'lodash.sortby'
+import { isDev } from '@/common/helpers/env'
+import { cn } from '@/lib/utils'
 
 const SearchesOverview = () => {
-  const { searches } = useListStore();
+  const { searches } = useListStore()
 
   const renderSearch = (search: Search) => {
     return (
@@ -27,8 +27,8 @@ const SearchesOverview = () => {
           </div>
         )}
       </li>
-    );
-  };
+    )
+  }
 
   return (
     <div className="">
@@ -40,7 +40,7 @@ const SearchesOverview = () => {
         ).map(renderSearch)}
       </ul>
     </div>
-  );
-};
+  )
+}
 
-export default SearchesOverview;
+export default SearchesOverview

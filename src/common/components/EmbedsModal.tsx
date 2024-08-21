@@ -1,31 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import Modal from './Modal';
-import { SelectableListWithHotkeys } from './SelectableListWithHotkeys';
-import { openWindow } from '../helpers/navigation';
-import { getUrlsInText } from '../helpers/text';
-import uniqBy from 'lodash.uniqby';
-import OpenGraphImage from './Embeds/OpenGraphImage';
-import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useState } from 'react'
+import Modal from './Modal'
+import { SelectableListWithHotkeys } from './SelectableListWithHotkeys'
+import { openWindow } from '../helpers/navigation'
+import { getUrlsInText } from '../helpers/text'
+import uniqBy from 'lodash.uniqby'
+import OpenGraphImage from './Embeds/OpenGraphImage'
+import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { cn } from '@/lib/utils'
 
 type EmbedsModalProps = {
-  cast: CastWithInteractions;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+  cast: CastWithInteractions
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 type UrlObject = {
-  url: string;
-};
+  url: string
+}
 
 const EmbedsModal = ({ cast, open, setOpen }: EmbedsModalProps) => {
-  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [selectedIdx, setSelectedIdx] = useState(0)
 
   useEffect(() => {
     if (!open) {
-      setSelectedIdx(0);
+      setSelectedIdx(0)
     }
-  }, [open]);
+  }, [open])
 
   const renderEmbedRow = (item: UrlObject, idx: number) => {
     return (
@@ -44,14 +44,14 @@ const EmbedsModal = ({ cast, open, setOpen }: EmbedsModalProps) => {
           {item.url}
         </span>
       </li>
-    );
-  };
+    )
+  }
 
-  const urls = uniqBy(cast?.embeds.concat(getUrlsInText(cast.text)), 'url') as UrlObject[];
+  const urls = uniqBy(cast?.embeds.concat(getUrlsInText(cast.text)), 'url') as UrlObject[]
 
   const onSelect = (idx: number) => {
-    openWindow(urls[idx].url);
-  };
+    openWindow(urls[idx].url)
+  }
 
   return (
     <Modal title={`Links in cast by ${cast?.author.display_name}`} open={open} setOpen={setOpen}>
@@ -67,7 +67,7 @@ const EmbedsModal = ({ cast, open, setOpen }: EmbedsModalProps) => {
       </div>
       <span className="ml-1 text-sm text-foreground/80">Use J and K no navigate down and up. Enter to open.</span>
     </Modal>
-  );
-};
+  )
+}
 
-export default EmbedsModal;
+export default EmbedsModal

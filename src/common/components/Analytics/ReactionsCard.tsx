@@ -1,20 +1,20 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AnalyticsGraph from './AnalyticsGraph';
-import { Interval } from '@/common/helpers/search';
-import { CombinedActivityData } from '@/common/types/types';
-import { formatLargeNumber } from '@/common/helpers/text';
+import React from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import AnalyticsGraph from './AnalyticsGraph'
+import { Interval } from '@/common/helpers/search'
+import { CombinedActivityData } from '@/common/types/types'
+import { formatLargeNumber } from '@/common/helpers/text'
 
 type ReactionsCardProps = {
-  interval: Interval;
-  data: CombinedActivityData;
-  isLoading: boolean;
-};
+  interval: Interval
+  data: CombinedActivityData
+  isLoading: boolean
+}
 
 const ReactionsCard = ({ interval, data, isLoading }: ReactionsCardProps) => {
-  const { overview, aggregated = [] } = data;
+  const { overview, aggregated = [] } = data
 
-  const value = (overview && overview[interval === Interval.d7 ? 'd7' : 'd30']) || 0;
+  const value = (overview && overview[interval === Interval.d7 ? 'd7' : 'd30']) || 0
   return (
     <Card className="h-fit">
       <CardHeader className="flex flex-row items-stretch space-y-0 border-b border-foreground/20 p-0">
@@ -42,7 +42,7 @@ const ReactionsCard = ({ interval, data, isLoading }: ReactionsCardProps) => {
         )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default ReactionsCard;
+export default ReactionsCard

@@ -1,53 +1,53 @@
-import React from 'react';
-import { SidebarHeader } from './SidebarHeader';
-import { useListStore } from '@/stores/useListStore';
-import sortBy from 'lodash.sortby';
-import { List } from '@/common/types/database.types';
+import React from 'react'
+import { SidebarHeader } from './SidebarHeader'
+import { useListStore } from '@/stores/useListStore'
+import sortBy from 'lodash.sortby'
+import { List } from '@/common/types/database.types'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 import {
   EllipsisVerticalIcon,
   MagnifyingGlassIcon,
   Cog6ToothIcon,
   BellIcon,
   EnvelopeIcon,
-} from '@heroicons/react/24/outline';
-import { useNavigationStore } from '@/stores/useNavigationStore';
-import { UUID } from 'crypto';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAccountStore } from '@/stores/useAccountStore';
-import UpgradeFreePlanCard from '../UpgradeFreePlanCard';
-import { cn } from '@/lib/utils';
+} from '@heroicons/react/24/outline'
+import { useNavigationStore } from '@/stores/useNavigationStore'
+import { UUID } from 'crypto'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAccountStore } from '@/stores/useAccountStore'
+import UpgradeFreePlanCard from '../UpgradeFreePlanCard'
+import { cn } from '@/lib/utils'
 
 type ListsOverviewProps = {
-  hideHeader?: boolean;
-  collapsible?: boolean;
-};
+  hideHeader?: boolean
+  collapsible?: boolean
+}
 
 const ManageListsOverview = ({ collapsible, hideHeader }: ListsOverviewProps) => {
-  const { searches, selectedListId, setSelectedListId, addList, lists } = useListStore();
-  const { accounts, selectedAccountIdx } = useAccountStore();
-  const selectedAccountId = accounts[selectedAccountIdx]?.id;
+  const { searches, selectedListId, setSelectedListId, addList, lists } = useListStore()
+  const { accounts, selectedAccountIdx } = useAccountStore()
+  const selectedAccountId = accounts[selectedAccountIdx]?.id
 
-  const { setIsManageListModalOpen } = useNavigationStore();
+  const { setIsManageListModalOpen } = useNavigationStore()
 
   const onOpenManageListModal = (id: UUID) => {
-    updateSelectedList(id);
-    setIsManageListModalOpen(true);
-  };
+    updateSelectedList(id)
+    setIsManageListModalOpen(true)
+  }
 
   const updateSelectedList = (id: UUID) => {
-    setSelectedListId(id);
-  };
+    setSelectedListId(id)
+  }
 
   const onClickSaveLastSearch = () => {
-    const lastSearch = searches[searches.length - 1];
+    const lastSearch = searches[searches.length - 1]
     if (lastSearch && selectedAccountId) {
       addList({
         name: lastSearch.term,
@@ -57,12 +57,12 @@ const ManageListsOverview = ({ collapsible, hideHeader }: ListsOverviewProps) =>
         },
         idx: 0,
         type: 'search',
-      });
+      })
     }
-  };
+  }
 
   const renderList = (list: List & { id: UUID }) => {
-    const isSelected = selectedListId === list.id;
+    const isSelected = selectedListId === list.id
 
     return (
       <li key={`list-${list.id}`} className="px-2 sm:px-3 lg:px-4">
@@ -100,8 +100,8 @@ const ManageListsOverview = ({ collapsible, hideHeader }: ListsOverviewProps) =>
           </div>
         </div>
       </li>
-    );
-  };
+    )
+  }
 
   const renderEmptyListsCard = () => (
     <Card className="m-4">
@@ -124,7 +124,7 @@ const ManageListsOverview = ({ collapsible, hideHeader }: ListsOverviewProps) =>
         </CardFooter>
       )}
     </Card>
-  );
+  )
 
   const renderLists = () => (
     <div className="flex flex-col">
@@ -133,7 +133,7 @@ const ManageListsOverview = ({ collapsible, hideHeader }: ListsOverviewProps) =>
         {sortBy(lists, (s) => s.idx).map(renderList)}
       </ul>
     </div>
-  );
+  )
 
   return (
     <div className="">
@@ -149,7 +149,7 @@ const ManageListsOverview = ({ collapsible, hideHeader }: ListsOverviewProps) =>
       )}
       {lists.length === 0 ? renderEmptyListsCard() : renderLists()}
     </div>
-  );
-};
+  )
+}
 
-export default ManageListsOverview;
+export default ManageListsOverview

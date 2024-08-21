@@ -1,18 +1,18 @@
 export type IcebreakerSocialInfo = {
   channels: {
-    type: string;
-    isVerified: boolean;
-    isLocked: boolean;
-    value: string;
-    url: string;
-  }[];
+    type: string
+    isVerified: boolean
+    isLocked: boolean
+    value: string
+    url: string
+  }[]
   credentials: {
-    name: string;
-    chain?: string;
-    source?: string;
-    reference?: string;
-  }[];
-};
+    name: string
+    chain?: string
+    source?: string
+    reference?: string
+  }[]
+}
 
 export async function getIcebreakerSocialInfoForFid(fid: string): Promise<IcebreakerSocialInfo | null> {
   try {
@@ -20,23 +20,23 @@ export async function getIcebreakerSocialInfoForFid(fid: string): Promise<Icebre
       headers: {
         accept: 'application/json',
       },
-    });
+    })
     if (!response.ok) {
-      console.log('Error fetching Icebreaker data:', response.statusText);
-      return null;
+      console.log('Error fetching Icebreaker data:', response.statusText)
+      return null
     }
-    const data = await response.json();
+    const data = await response.json()
     if (data && data.profiles && data?.profiles.length === 1) {
-      const profile = data.profiles[0];
+      const profile = data.profiles[0]
       return {
         channels: profile?.channels || [],
         credentials: profile?.credentials || [],
-      };
+      }
     } else {
-      return null;
+      return null
     }
   } catch (error) {
-    console.error('Error fetching Icebreaker data:', error);
-    return null;
+    console.error('Error fetching Icebreaker data:', error)
+    return null
   }
 }

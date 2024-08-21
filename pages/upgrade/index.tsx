@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Radio, RadioGroup } from '@headlessui/react';
-import { Button } from '@/components/ui/button';
-import { CheckIcon } from '@heroicons/react/24/outline';
-import { XCircleIcon } from '@heroicons/react/24/solid';
-import { cn } from '@/lib/utils';
-import { isPaidUser, useUserStore } from '../../src/stores/useUserStore';
-import { useRouter } from 'next/router';
-import { CheckCircleIcon, MagnifyingGlassIcon, PencilSquareIcon } from '@heroicons/react/20/solid';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { openWindow } from '@/common/helpers/navigation';
-import Link from 'next/link';
+import React, { useEffect, useState } from 'react'
+import { Radio, RadioGroup } from '@headlessui/react'
+import { Button } from '@/components/ui/button'
+import { CheckIcon } from '@heroicons/react/24/outline'
+import { XCircleIcon } from '@heroicons/react/24/solid'
+import { cn } from '@/lib/utils'
+import { isPaidUser, useUserStore } from '../../src/stores/useUserStore'
+import { useRouter } from 'next/router'
+import { CheckCircleIcon, MagnifyingGlassIcon, PencilSquareIcon } from '@heroicons/react/20/solid'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { openWindow } from '@/common/helpers/navigation'
+import Link from 'next/link'
 function Logomark(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
     <svg viewBox="0 0 40 40" aria-hidden="true" {...props}>
@@ -19,7 +19,7 @@ function Logomark(props: React.ComponentPropsWithoutRef<'svg'>) {
         d="M20 40C8.954 40 0 31.046 0 20S8.954 0 20 0s20 8.954 20 20-8.954 20-20 20ZM4 20c0 7.264 5.163 13.321 12.02 14.704C17.642 35.03 19 33.657 19 32V8c0-1.657-1.357-3.031-2.98-2.704C9.162 6.68 4 12.736 4 20Z"
       />
     </svg>
-  );
+  )
 }
 
 const plans = [
@@ -104,25 +104,25 @@ const plans = [
     unavilableFeatures: [],
     logomarkClassName: 'fill-gray-500',
   },
-];
+]
 
 type PlanProps = {
-  name: string;
+  name: string
   price: {
-    Monthly: string;
-    Biannually: string;
-  };
-  description: string;
+    Monthly: string
+    Biannually: string
+  }
+  description: string
   button: {
-    Monthly: { label: string; href: string };
-    Biannually: { label: string; href: string };
-  };
-  features: Array<string>;
-  unavilableFeatures: Array<string>;
-  activePeriod: 'Monthly' | 'Biannually';
-  logomarkClassName?: string;
-  featured?: boolean;
-};
+    Monthly: { label: string; href: string }
+    Biannually: { label: string; href: string }
+  }
+  features: Array<string>
+  unavilableFeatures: Array<string>
+  activePeriod: 'Monthly' | 'Biannually'
+  logomarkClassName?: string
+  featured?: boolean
+}
 
 function Plan({
   name,
@@ -135,8 +135,8 @@ function Plan({
   logomarkClassName,
   featured = false,
 }: PlanProps) {
-  const isPayingUser = isPaidUser();
-  const isPaidPlan = price.Monthly !== '€0';
+  const isPayingUser = isPaidUser()
+  const isPaidPlan = price.Monthly !== '€0'
 
   const renderPlanButton = () => (
     <Link href={button[activePeriod].href} prefetch={false} className="w-full mx-auto">
@@ -148,7 +148,7 @@ function Plan({
         {!isPayingUser && isPaidPlan ? 'Upgrade' : 'Your plan'}
       </Button>
     </Link>
-  );
+  )
 
   return (
     <div>
@@ -217,11 +217,11 @@ function Plan({
         {renderPlanButton()}
       </Card>
     </div>
-  );
+  )
 }
 
 export function Pricing() {
-  const [activePeriod, setActivePeriod] = useState<'Monthly' | 'Biannually'>('Biannually');
+  const [activePeriod, setActivePeriod] = useState<'Monthly' | 'Biannually'>('Biannually')
 
   return (
     <section id="pricing" aria-labelledby="pricing-title" className="py-12">
@@ -270,23 +270,23 @@ export function Pricing() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
 export default function UpgradePage() {
-  const router = useRouter();
-  const { addUnsafeCustomerForUser } = useUserStore();
-  const hasPaidViaStripe = router.query.success === 'true';
-  const isPayingUser = isPaidUser();
+  const router = useRouter()
+  const { addUnsafeCustomerForUser } = useUserStore()
+  const hasPaidViaStripe = router.query.success === 'true'
+  const isPayingUser = isPaidUser()
 
   useEffect(() => {
     if (hasPaidViaStripe && !isPayingUser) {
       // this is a temporary hack until we integrate with Stripe webhooks
       addUnsafeCustomerForUser({
         stripe_customer_id: 'manual_entry',
-      });
+      })
     }
-  }, [hasPaidViaStripe, isPayingUser]);
+  }, [hasPaidViaStripe, isPayingUser])
 
   const renderUpgradeContent = () => (
     <div className="flex min-h-full flex-1 flex-col px-6 py-8 lg:px-8 space-y-4">
@@ -312,7 +312,7 @@ export default function UpgradePage() {
       )}
       <Pricing />
     </div>
-  );
+  )
 
   const renderUpgradeSuccessContent = () => (
     <div className="m-6 flex min-h-full flex-1 flex-col px-6 py-8 lg:px-8">
@@ -346,7 +346,7 @@ export default function UpgradePage() {
         </Card>
       </div>
     </div>
-  );
+  )
 
-  return <div className="bg-background">{isPayingUser ? renderUpgradeSuccessContent() : renderUpgradeContent()}</div>;
+  return <div className="bg-background">{isPayingUser ? renderUpgradeSuccessContent() : renderUpgradeContent()}</div>
 }

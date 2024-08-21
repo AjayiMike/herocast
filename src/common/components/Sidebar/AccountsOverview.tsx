@@ -1,65 +1,65 @@
-import React from 'react';
-import { AccountObjectType, PENDING_ACCOUNT_NAME_PLACEHOLDER, useAccountStore } from '@/stores/useAccountStore';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
-import { SidebarHeader } from './SidebarHeader';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import HotkeyTooltipWrapper from '../HotkeyTooltipWrapper';
-import { useRouter } from 'next/router';
-import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { AccountObjectType, PENDING_ACCOUNT_NAME_PLACEHOLDER, useAccountStore } from '@/stores/useAccountStore'
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
+import { SidebarHeader } from './SidebarHeader'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import HotkeyTooltipWrapper from '../HotkeyTooltipWrapper'
+import { useRouter } from 'next/router'
+import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts'
+import { cn } from '@/lib/utils'
 
 const AccountsOverview = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const { accounts, selectedAccountIdx, setCurrentAccountIdx } = useAccountStore();
+  const { accounts, selectedAccountIdx, setCurrentAccountIdx } = useAccountStore()
 
   const renderStatus = (status: string) => {
     switch (status) {
       case 'active':
-        return <></>;
+        return <></>
       case 'pre-migration':
-        return <span className={cn('flex-none text-sm text-yellow-300/80')}>pre-migration account</span>;
+        return <span className={cn('flex-none text-sm text-yellow-300/80')}>pre-migration account</span>
       default:
-        return <span className={cn('underline flex-none text-sm text-foreground/70')}>{status}</span>;
+        return <span className={cn('underline flex-none text-sm text-foreground/70')}>{status}</span>
     }
-  };
+  }
 
   const renderAccountPlatformIndicator = (platform: AccountPlatformType) => {
     switch (platform) {
       case AccountPlatformType.farcaster_hats_protocol:
-        return <p className="truncate text-md text-foreground grayscale group-hover:grayscale-0">🧢</p>;
+        return <p className="truncate text-md text-foreground grayscale group-hover:grayscale-0">🧢</p>
       case AccountPlatformType.farcaster_local_readonly:
         return (
           <p className="truncate text-md text-foreground grayscale group-hover:grayscale-0">
             <ArrowDownTrayIcon className="w-4 h-4" />
           </p>
-        );
+        )
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   const onClickAccount = (idx: number, isActive: boolean, isReadOnly: boolean) => {
     if (isActive) {
-      setCurrentAccountIdx(idx);
+      setCurrentAccountIdx(idx)
     } else if (isReadOnly) {
-      router.push(`/login?signupOnly=true`);
+      router.push(`/login?signupOnly=true`)
     } else {
-      router.push(`/accounts`);
+      router.push(`/accounts`)
     }
-  };
+  }
   const renderAccounts = () => (
     <Tooltip.Provider delayDuration={50} skipDelayDuration={0}>
       <ul role="list" className="mx-4 divide-y divide-white/5">
         {accounts.map((account: AccountObjectType, idx: number) => {
-          const isActive = account.status === AccountStatusType.active;
-          const isReadOnly = account.platform === AccountPlatformType.farcaster_local_readonly;
+          const isActive = account.status === AccountStatusType.active
+          const isReadOnly = account.platform === AccountPlatformType.farcaster_local_readonly
           const getTooltipText = () => {
             if (isReadOnly) {
-              return 'Local, read-only account';
+              return 'Local, read-only account'
             }
-            return isActive ? `Ctrl + ${idx + 1}` : 'Finish onboarding';
-          };
+            return isActive ? `Ctrl + ${idx + 1}` : 'Finish onboarding'
+          }
           return (
             <li key={`${account.name}-${account.id}`} className="px-2 py-2 sm:px-3 lg:px-4">
               <HotkeyTooltipWrapper hotkey={getTooltipText()} side="top">
@@ -92,18 +92,18 @@ const AccountsOverview = () => {
                 </div>
               </HotkeyTooltipWrapper>
             </li>
-          );
+          )
         })}
       </ul>
     </Tooltip.Provider>
-  );
+  )
 
   return (
     <div>
       <SidebarHeader title="Accounts" />
       {renderAccounts()}
     </div>
-  );
-};
+  )
+}
 
-export default AccountsOverview;
+export default AccountsOverview

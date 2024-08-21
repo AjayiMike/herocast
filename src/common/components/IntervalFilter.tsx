@@ -1,30 +1,30 @@
-'use client';
+'use client'
 
-import * as React from 'react';
+import * as React from 'react'
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
-import { Interval } from '../helpers/search';
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { Interval } from '../helpers/search'
 
 type IntervalFilterProps = {
-  intervals: Interval[];
-  defaultInterval?: Interval;
-  updateInterval?: (value: Interval) => void;
-};
+  intervals: Interval[]
+  defaultInterval?: Interval
+  updateInterval?: (value: Interval) => void
+}
 
 export function IntervalFilter({ intervals, defaultInterval, updateInterval }: IntervalFilterProps) {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<Interval | undefined>(defaultInterval);
+  const [open, setOpen] = React.useState(false)
+  const [value, setValue] = React.useState<Interval | undefined>(defaultInterval)
 
-  const canSelect = updateInterval !== undefined;
+  const canSelect = updateInterval !== undefined
   const handleSelect = (currentValue: Interval) => {
-    setValue(currentValue === value ? undefined : currentValue);
-    updateInterval?.(currentValue);
-    setOpen(false);
-  };
+    setValue(currentValue === value ? undefined : currentValue)
+    updateInterval?.(currentValue)
+    setOpen(false)
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -60,5 +60,5 @@ export function IntervalFilter({ intervals, defaultInterval, updateInterval }: I
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

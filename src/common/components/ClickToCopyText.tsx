@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import clsx from 'clsx';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
-import { addToClipboard } from '../helpers/clipboard';
+import React, { useState } from 'react'
+import clsx from 'clsx'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
+import { addToClipboard } from '../helpers/clipboard'
 
 type ClickToCopyTextProps = {
-  className?: string;
-  buttonText?: string;
-  text: string;
-  disabled?: boolean;
-  size?: 'sm' | 'lg';
-};
+  className?: string
+  buttonText?: string
+  text: string
+  disabled?: boolean
+  size?: 'sm' | 'lg'
+}
 
 const ClickToCopyText = ({ className, disabled, buttonText, text, size = 'lg' }: ClickToCopyTextProps) => {
-  const [didClickCopyShare, setDidClickCopyShare] = useState(false);
+  const [didClickCopyShare, setDidClickCopyShare] = useState(false)
 
   const getButtonText = () => {
-    if (didClickCopyShare) return 'Copied';
-    if (buttonText) return buttonText;
-    return 'Copy';
-  };
+    if (didClickCopyShare) return 'Copied'
+    if (buttonText) return buttonText
+    return 'Copy'
+  }
 
   return (
     <Button
@@ -29,11 +29,11 @@ const ClickToCopyText = ({ className, disabled, buttonText, text, size = 'lg' }:
       className={cn('flex gap-x-1 px-2', className)}
       disabled={didClickCopyShare || disabled}
       onClick={() => {
-        setDidClickCopyShare(true);
-        addToClipboard(text);
+        setDidClickCopyShare(true)
+        addToClipboard(text)
         setTimeout(() => {
-          setDidClickCopyShare(false);
-        }, 2000);
+          setDidClickCopyShare(false)
+        }, 2000)
       }}
     >
       <ClipboardDocumentIcon
@@ -45,7 +45,7 @@ const ClickToCopyText = ({ className, disabled, buttonText, text, size = 'lg' }:
       />
       {getButtonText()}
     </Button>
-  );
-};
+  )
+}
 
-export default ClickToCopyText;
+export default ClickToCopyText

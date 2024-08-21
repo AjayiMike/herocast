@@ -1,21 +1,21 @@
-import React from 'react';
-import Modal from '../Modal';
-import { AccountObjectType } from '@/stores/useAccountStore';
-import AccountManagement from './AccountManagement';
-import { AccountPlatformType } from '@/common/constants/accounts';
-import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/router';
+import React from 'react'
+import Modal from '../Modal'
+import { AccountObjectType } from '@/stores/useAccountStore'
+import AccountManagement from './AccountManagement'
+import { AccountPlatformType } from '@/common/constants/accounts'
+import { ArrowDownTrayIcon } from '@heroicons/react/20/solid'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/router'
 
 type AccountManagementModalProps = {
-  account?: AccountObjectType;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+  account?: AccountObjectType
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 const AccountManagementModal = ({ account, open, setOpen }: AccountManagementModalProps) => {
-  const router = useRouter();
-  if (!account) return;
+  const router = useRouter()
+  if (!account) return
 
   const renderReadOnlyAccountContent = () => (
     <div className="flex flex-col items-center">
@@ -31,9 +31,9 @@ const AccountManagementModal = ({ account, open, setOpen }: AccountManagementMod
         </Button>
       </div>
     </div>
-  );
+  )
 
-  const renderEditableAccountContent = () => <AccountManagement account={account} onSuccess={() => setOpen(false)} />;
+  const renderEditableAccountContent = () => <AccountManagement account={account} onSuccess={() => setOpen(false)} />
 
   return (
     <Modal title={`Manage account ${account.name}`} open={open} setOpen={setOpen}>
@@ -43,7 +43,7 @@ const AccountManagementModal = ({ account, open, setOpen }: AccountManagementMod
           : renderEditableAccountContent()}
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default AccountManagementModal;
+export default AccountManagementModal

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 
 export async function makeGraphqlRequest<T>(url: string, query: string, variables: any): Promise<T> {
   return await axios
@@ -19,6 +19,6 @@ export async function makeGraphqlRequest<T>(url: string, query: string, variable
     .catch((err) => {
       throw {
         error: err,
-      };
-    });
+      }
+    })
 }

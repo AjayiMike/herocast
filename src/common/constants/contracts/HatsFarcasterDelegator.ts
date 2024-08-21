@@ -507,4 +507,4 @@ export const HatsFarcasterDelegatorAbi = [
     name: 'Unauthorized',
     inputs: [],
   },
-] as const;
+] as const

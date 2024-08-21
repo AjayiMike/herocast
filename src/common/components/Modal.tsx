@@ -1,15 +1,15 @@
-import React from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
-import { Cross2Icon } from '@radix-ui/react-icons';
+import React from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Cross2Icon } from '@radix-ui/react-icons'
 
 type ModalProps = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  title?: string | React.ReactNode;
-  description?: string;
-  children?: React.ReactNode;
-  focusMode?: boolean;
-};
+  open: boolean
+  setOpen: (open: boolean) => void
+  title?: string | React.ReactNode
+  description?: string
+  children?: React.ReactNode
+  focusMode?: boolean
+}
 
 const Modal: React.FC<ModalProps> = ({ open, setOpen, title, description, children, focusMode }) => {
   return (
@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({ open, setOpen, title, description, childr
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  );
-};
+  )
+}
 
-export default Modal;
+export default Modal

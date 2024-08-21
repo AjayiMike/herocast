@@ -1,69 +1,69 @@
-import React from 'react';
-import { Channel } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import clsx from 'clsx';
+import React from 'react'
+import { Channel } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { forwardRef, useImperativeHandle, useState, useEffect } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+import clsx from 'clsx'
 
 type ChannelListRef = {
-  onKeyDown: (props: { event: Event }) => boolean;
-};
+  onKeyDown: (props: { event: Event }) => boolean
+}
 
 type Props = {
-  items: Array<Channel | null>;
-  command: any;
-  query?: string;
-};
+  items: Array<Channel | null>
+  command: any
+  query?: string
+}
 
 export const ChannelList = forwardRef<ChannelListRef, Props>((props, ref) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const selectItem = (index: number) => {
-    const item = props.items[index];
+    const item = props.items[index]
 
     if (item) {
-      props.command({ id: item.id });
+      props.command({ id: item.id })
     }
-  };
+  }
 
   const upHandler = () => {
-    setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length);
-  };
+    setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length)
+  }
 
   const downHandler = () => {
-    setSelectedIndex((selectedIndex + 1) % props.items.length);
-  };
+    setSelectedIndex((selectedIndex + 1) % props.items.length)
+  }
 
   const enterHandler = () => {
-    selectItem(selectedIndex);
-  };
+    selectItem(selectedIndex)
+  }
 
-  useEffect(() => setSelectedIndex(0), [props.items]);
+  useEffect(() => setSelectedIndex(0), [props.items])
 
   useImperativeHandle(ref, () => ({
     onKeyDown: ({ event }: { event: Event }) => {
       if (!(event instanceof KeyboardEvent)) {
-        return false;
+        return false
       }
 
       if (event.key === 'ArrowUp') {
-        upHandler();
-        return true;
+        upHandler()
+        return true
       }
 
       if (event.key === 'ArrowDown') {
-        downHandler();
-        return true;
+        downHandler()
+        return true
       }
 
       if (event.key === 'Enter') {
-        enterHandler();
-        return true;
+        enterHandler()
+        return true
       }
 
-      return false;
+      return false
     },
-  }));
+  }))
 
-  const noResults = props.items.length === 1 && props.items[0] === null;
+  const noResults = props.items.length === 1 && props.items[0] === null
 
   return (
     // Menu messes with focus which we don't want here
@@ -111,7 +111,7 @@ export const ChannelList = forwardRef<ChannelListRef, Props>((props, ref) => {
         </div>
       )}
     </div>
-  );
-});
+  )
+})
 
-ChannelList.displayName = 'ChannelList';
+ChannelList.displayName = 'ChannelList'

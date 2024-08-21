@@ -1,7 +1,7 @@
-import { HatsFarcasterDelegatorAbi } from '@/common/constants/contracts/HatsFarcasterDelegator';
-import { config } from '@/common/helpers/rainbowkit';
-import { Registry } from '@hatsprotocol/modules-sdk';
-import { readContract } from '@wagmi/core';
+import { HatsFarcasterDelegatorAbi } from '@/common/constants/contracts/HatsFarcasterDelegator'
+import { config } from '@/common/helpers/rainbowkit'
+import { Registry } from '@hatsprotocol/modules-sdk'
+import { readContract } from '@wagmi/core'
 
 export const getCustomRegistry = (): Registry => {
   return {
@@ -1191,8 +1191,8 @@ export const getCustomRegistry = (): Registry => {
         ],
       },
     ],
-  };
-};
+  }
+}
 
 export async function isValidSigner(
   contractAddress: `0x${string}`,
@@ -1204,9 +1204,9 @@ export async function isValidSigner(
     abi: HatsFarcasterDelegatorAbi,
     functionName: 'isValidSigner',
     args: [typeHash, signer],
-  });
-  console.log('isValidSigner result', res);
-  return res;
+  })
+  console.log('isValidSigner result', res)
+  return res
 }
 
 export async function isValidSignature(
@@ -1219,9 +1219,9 @@ export async function isValidSignature(
     abi: HatsFarcasterDelegatorAbi,
     functionName: 'isValidSignature',
     args: [hash, sig],
-  });
-  console.log('isValidSignature result', res, 'isValid: ', res === '0x1626ba7e');
-  return res === '0x1626ba7e';
+  })
+  console.log('isValidSignature result', res, 'isValid: ', res === '0x1626ba7e')
+  return res === '0x1626ba7e'
 }
 
-export const SIGNED_KEY_REQUEST_TYPEHASH = '0x16be47f1f1f50a66a48db64eba3fd35c21439c23622e513aab5b902018aec438';
+export const SIGNED_KEY_REQUEST_TYPEHASH = '0x16be47f1f1f50a66a48db64eba3fd35c21439c23622e513aab5b902018aec438'

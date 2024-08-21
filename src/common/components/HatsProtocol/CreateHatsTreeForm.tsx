@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { UseFormProps, useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { AccountObjectType } from '@/stores/useAccountStore';
-import { Cog6ToothIcon } from '@heroicons/react/20/solid';
-import { toast } from 'sonner';
-import { isAddress } from 'viem';
-import { Input } from '@/components/ui/input';
-import { createInitialTree } from '@/common/helpers/hats';
-import { useAccount, useSwitchChain, useWalletClient } from 'wagmi';
-import { convertEnsNameToAddress, convertEnsNamesToAddresses } from '@/common/helpers/ens';
-import EnsLookupLabel from '../EnsLookupLabel';
-import { optimism } from 'wagmi/chains';
-import SwitchWalletButton from '../SwitchWalletButton';
+import React, { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { UseFormProps, useFieldArray, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import { AccountObjectType } from '@/stores/useAccountStore'
+import { Cog6ToothIcon } from '@heroicons/react/20/solid'
+import { toast } from 'sonner'
+import { isAddress } from 'viem'
+import { Input } from '@/components/ui/input'
+import { createInitialTree } from '@/common/helpers/hats'
+import { useAccount, useSwitchChain, useWalletClient } from 'wagmi'
+import { convertEnsNameToAddress, convertEnsNamesToAddresses } from '@/common/helpers/ens'
+import EnsLookupLabel from '../EnsLookupLabel'
+import { optimism } from 'wagmi/chains'
+import SwitchWalletButton from '../SwitchWalletButton'
 
 enum CREATE_HATS_TREE_FORM_STEP {
   DEFAULT = 'DEFAULT',
@@ -24,8 +24,8 @@ enum CREATE_HATS_TREE_FORM_STEP {
 }
 
 const isValidFormAddressInput = (input: string) => {
-  return isAddress(input) || input.endsWith('.eth');
-};
+  return isAddress(input) || input.endsWith('.eth')
+}
 
 const CreateHatsTreeFormSchema = z.object({
   adminHatAddress: z.string().refine(isValidFormAddressInput, {
@@ -41,22 +41,22 @@ const CreateHatsTreeFormSchema = z.object({
       })
     )
     .nonempty(),
-});
+})
 
-type CasterHatAddress = z.infer<typeof CreateHatsTreeFormSchema>['casterHatAddresses'][number];
+type CasterHatAddress = z.infer<typeof CreateHatsTreeFormSchema>['casterHatAddresses'][number]
 
 const casterHatAddressesInitial: CasterHatAddress[] = [
   { id: '1', address: '' },
   { id: '2', address: '' },
-];
+]
 
 type CreateHatsTreeFormProps = {
-  onSuccess?: ({ casterHatId, adminHatId }: { casterHatId; adminHatId }) => void;
-};
+  onSuccess?: ({ casterHatId, adminHatId }: { casterHatId; adminHatId }) => void
+}
 
 function useZodForm<TSchema extends z.ZodType>(
   props: Omit<UseFormProps<TSchema['_input']>, 'resolver'> & {
-    schema: TSchema;
+    schema: TSchema
   }
 ) {
   const form = useForm<TSchema['_input']>({
@@ -65,19 +65,19 @@ function useZodForm<TSchema extends z.ZodType>(
       // This makes it so we can use `.transform()`s on the schema without same transform getting applied again when it reaches the server
       rawValues: true,
     }),
-  });
+  })
 
-  return form;
+  return form
 }
 
 const CreateHatsTreeForm = ({ onSuccess }: CreateHatsTreeFormProps) => {
-  const [formState, setFormState] = useState<CREATE_HATS_TREE_FORM_STEP>(CREATE_HATS_TREE_FORM_STEP.DEFAULT);
-  const walletClient = useWalletClient()?.data;
-  const { chains, status, switchChain, switchChainAsync } = useSwitchChain();
-  const [isPending, setIsPending] = useState(false);
-  const [casterHatId, setCasterHatId] = useState<bigint>();
-  const [adminHatId, setAdminHatId] = useState<bigint>();
-  const { isConnected, address, chainId } = useAccount();
+  const [formState, setFormState] = useState<CREATE_HATS_TREE_FORM_STEP>(CREATE_HATS_TREE_FORM_STEP.DEFAULT)
+  const walletClient = useWalletClient()?.data
+  const { chains, status, switchChain, switchChainAsync } = useSwitchChain()
+  const [isPending, setIsPending] = useState(false)
+  const [casterHatId, setCasterHatId] = useState<bigint>()
+  const [adminHatId, setAdminHatId] = useState<bigint>()
+  const { isConnected, address, chainId } = useAccount()
   const form = useZodForm({
     schema: CreateHatsTreeFormSchema,
     mode: 'onChange',
@@ -85,54 +85,54 @@ const CreateHatsTreeForm = ({ onSuccess }: CreateHatsTreeFormProps) => {
       adminHatAddress: address,
       casterHatAddresses: casterHatAddressesInitial,
     },
-  });
+  })
 
   const { fields, append, remove } = useFieldArray({
     name: 'casterHatAddresses',
     control: form.control,
     rules: {},
-  });
+  })
 
   const onHatsTreeCreated = () => {
     toast.success('Created your Hats tree successfully', {
       duration: 7000,
-    });
-    onSuccess?.({ adminHatId, casterHatId });
-  };
+    })
+    onSuccess?.({ adminHatId, casterHatId })
+  }
 
   useEffect(() => {
     if (formState === CREATE_HATS_TREE_FORM_STEP.PENDING_ONCHAIN_CONFIRMATION) {
       setTimeout(() => {
-        setFormState(CREATE_HATS_TREE_FORM_STEP.SUCCESS);
-      }, 3000);
+        setFormState(CREATE_HATS_TREE_FORM_STEP.SUCCESS)
+      }, 3000)
     }
 
     if (formState === CREATE_HATS_TREE_FORM_STEP.SUCCESS) {
-      onHatsTreeCreated();
+      onHatsTreeCreated()
     }
-  }, [formState]);
+  }, [formState])
 
-  const canSubmitForm = !isPending && !!form.formState.isDirty && !!form.formState.isValid && chainId;
+  const canSubmitForm = !isPending && !!form.formState.isDirty && !!form.formState.isValid && chainId
 
   const createHatsTree = async (data) => {
     if (!walletClient) {
-      return;
+      return
     }
 
-    setIsPending(true);
+    setIsPending(true)
 
-    const adminHatAddress = await convertEnsNameToAddress(data.adminHatAddress);
-    const casterHatAddresses = await convertEnsNamesToAddresses(data.casterHatAddresses.map((obj) => obj.address));
+    const adminHatAddress = await convertEnsNameToAddress(data.adminHatAddress)
+    const casterHatAddresses = await convertEnsNamesToAddresses(data.casterHatAddresses.map((obj) => obj.address))
 
-    data.adminHatAddress = adminHatAddress;
+    data.adminHatAddress = adminHatAddress
     data.casterHatAddresses = data.casterHatAddresses.map((obj, index) => {
       if (casterHatAddresses[index]) {
         return {
           ...obj,
           address: casterHatAddresses[index],
-        };
+        }
       }
-    });
+    })
 
     try {
       const { casterHat, adminHat } = await createInitialTree(
@@ -140,21 +140,21 @@ const CreateHatsTreeForm = ({ onSuccess }: CreateHatsTreeFormProps) => {
         data.adminHatAddress as `0x${string}`,
         data.casterHatAddresses.map((obj) => obj.address) as `0x${string}`[],
         walletClient
-      );
-      setCasterHatId(casterHat);
-      setAdminHatId(adminHat);
+      )
+      setCasterHatId(casterHat)
+      setAdminHatId(adminHat)
 
-      setFormState(CREATE_HATS_TREE_FORM_STEP.PENDING_ONCHAIN_CONFIRMATION);
+      setFormState(CREATE_HATS_TREE_FORM_STEP.PENDING_ONCHAIN_CONFIRMATION)
     } catch (e) {
-      console.log('Error:', e);
+      console.log('Error:', e)
       form.setError('adminHatAddress', {
         type: 'manual',
         message: `Error creating hats tree -> ${e}`,
-      });
+      })
     } finally {
-      setIsPending(false);
+      setIsPending(false)
     }
-  };
+  }
 
   const renderForm = () => (
     <Form {...form}>
@@ -202,7 +202,7 @@ const CreateHatsTreeForm = ({ onSuccess }: CreateHatsTreeFormProps) => {
                   </Button>
                 )}
               </div>
-            );
+            )
           })}
           <Button
             variant="outline"
@@ -242,14 +242,14 @@ const CreateHatsTreeForm = ({ onSuccess }: CreateHatsTreeFormProps) => {
         </div>
       </form>
     </Form>
-  );
+  )
 
   const renderContent = () => {
     switch (formState) {
       case CREATE_HATS_TREE_FORM_STEP.DEFAULT:
-        return renderForm();
+        return renderForm()
       case CREATE_HATS_TREE_FORM_STEP.PENDING_ONCHAIN_CONFIRMATION:
-        return <p>Waiting for onchain confirmation...</p>;
+        return <p>Waiting for onchain confirmation...</p>
       case CREATE_HATS_TREE_FORM_STEP.SUCCESS:
         return (
           <div>
@@ -263,15 +263,15 @@ const CreateHatsTreeForm = ({ onSuccess }: CreateHatsTreeFormProps) => {
               <p>Continue</p>
             </Button>
           </div>
-        );
+        )
       case CREATE_HATS_TREE_FORM_STEP.ERROR:
-        return <p>Error creating Hats tree</p>;
+        return <p>Error creating Hats tree</p>
       default:
-        return null;
+        return null
     }
-  };
+  }
 
-  return <div className="max-w-lg flex flex-col gap-y-4">{renderContent()}</div>;
-};
+  return <div className="max-w-lg flex flex-col gap-y-4">{renderContent()}</div>
+}
 
-export default CreateHatsTreeForm;
+export default CreateHatsTreeForm

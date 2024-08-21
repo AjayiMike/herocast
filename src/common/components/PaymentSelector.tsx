@@ -1,30 +1,30 @@
 /* eslint-disable @next/next/no-img-element */
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { CheckIcon, CaretSortIcon } from '@radix-ui/react-icons';
+import { CheckIcon, CaretSortIcon } from '@radix-ui/react-icons'
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
-import { Command, CommandGroup, CommandItem, CommandList, CommandShortcut } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useAccount } from 'wagmi';
-import { getChain, getGlidePaymentOptions } from '../helpers/glide';
-import { PaymentOption } from 'node_modules/@paywithglide/glide-js/dist/types';
-import { Hex } from 'viem';
-import { Loading } from './Loading';
+import { Command, CommandGroup, CommandItem, CommandList, CommandShortcut } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useAccount } from 'wagmi'
+import { getChain, getGlidePaymentOptions } from '../helpers/glide'
+import { PaymentOption } from 'node_modules/@paywithglide/glide-js/dist/types'
+import { Hex } from 'viem'
+import { Loading } from './Loading'
 
 export interface RegistrationTransactionData {
-  address?: Hex;
-  registerSignature?: Hex;
-  addSignature?: Hex;
-  publicKey?: Hex;
-  metadata?: Hex;
-  deadline?: bigint;
-  price?: bigint;
-  chainId?: number;
+  address?: Hex
+  registerSignature?: Hex
+  addSignature?: Hex
+  publicKey?: Hex
+  metadata?: Hex
+  deadline?: bigint
+  price?: bigint
+  chainId?: number
 }
 
 export function PaymentSelector({
@@ -39,17 +39,17 @@ export function PaymentSelector({
   deadline,
   setError,
 }) {
-  const { address, isConnected } = useAccount();
-  const [open, setOpen] = useState(false);
-  const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isRetry, setIsRetry] = useState<boolean>(false);
+  const { address, isConnected } = useAccount()
+  const [open, setOpen] = useState(false)
+  const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isRetry, setIsRetry] = useState<boolean>(false)
 
   const updatePaymentOptions = async (): Promise<void> => {
-    if (!address || !registerSignature || !publicKey || !metadata || !deadline) return;
-    console.log('updatePaymentOptions', registerPrice);
-    setIsLoading(true);
-    setIsRetry(false);
+    if (!address || !registerSignature || !publicKey || !metadata || !deadline) return
+    console.log('updatePaymentOptions', registerPrice)
+    setIsLoading(true)
+    setIsRetry(false)
     try {
       const paymentOptions = await getGlidePaymentOptions({
         chainId,
@@ -60,26 +60,26 @@ export function PaymentSelector({
         metadata,
         deadline,
         price: registerPrice,
-      });
-      console.log('glide paymentOptions', paymentOptions);
-      setPaymentOptions(paymentOptions);
-      setIsLoading(false);
+      })
+      console.log('glide paymentOptions', paymentOptions)
+      setPaymentOptions(paymentOptions)
+      setIsLoading(false)
     } catch (error: any) {
-      setIsRetry(true);
-      setError(`There was an error fetching payment options. ${error.message}`);
-      setIsLoading(false);
+      setIsRetry(true)
+      setError(`There was an error fetching payment options. ${error.message}`)
+      setIsLoading(false)
     }
-  };
+  }
 
   const getPaymentOptionFromValue = (value: string) => {
-    return paymentOptions.find((option) => option.paymentCurrency === value);
-  };
+    return paymentOptions.find((option) => option.paymentCurrency === value)
+  }
 
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected) return
 
-    updatePaymentOptions();
-  }, [isConnected, address, registerPrice, publicKey, deadline]);
+    updatePaymentOptions()
+  }, [isConnected, address, registerPrice, publicKey, deadline])
 
   const renderSelector = () => (
     <Popover open={open} onOpenChange={setOpen}>
@@ -114,11 +114,11 @@ export function PaymentSelector({
                   key={option.paymentCurrency}
                   value={option.paymentCurrency}
                   onSelect={async (currentValue) => {
-                    const isDeselect = currentValue.toLowerCase() === paymentOption?.paymentCurrency.toLowerCase();
-                    const selectedPaymentOption = getPaymentOptionFromValue(currentValue);
+                    const isDeselect = currentValue.toLowerCase() === paymentOption?.paymentCurrency.toLowerCase()
+                    const selectedPaymentOption = getPaymentOptionFromValue(currentValue)
                     if (!isDeselect && selectedPaymentOption) {
-                      setPaymentOption(selectedPaymentOption);
-                      setOpen(false);
+                      setPaymentOption(selectedPaymentOption)
+                      setOpen(false)
                     }
                   }}
                 >
@@ -144,7 +144,7 @@ export function PaymentSelector({
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 
   return !paymentOptions || paymentOptions.length === 0 ? (
     <div className="py-3">
@@ -160,5 +160,5 @@ export function PaymentSelector({
     </div>
   ) : (
     renderSelector()
-  );
+  )
 }

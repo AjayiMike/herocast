@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useAccountModal, useConnectModal } from '@rainbow-me/rainbowkit';
-import { useAccount, useSignTypedData, useWaitForTransactionReceipt } from 'wagmi';
-import { Input } from '@/components/ui/input';
-import { HatsFarcasterDelegatorAbi } from '@/common/constants/contracts/HatsFarcasterDelegator';
-import { encodeAbiParameters, encodePacked, hashTypedData, keccak256 } from 'viem';
+import React, { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { useAccountModal, useConnectModal } from '@rainbow-me/rainbowkit'
+import { useAccount, useSignTypedData, useWaitForTransactionReceipt } from 'wagmi'
+import { Input } from '@/components/ui/input'
+import { HatsFarcasterDelegatorAbi } from '@/common/constants/contracts/HatsFarcasterDelegator'
+import { encodeAbiParameters, encodePacked, hashTypedData, keccak256 } from 'viem'
 import {
   SIGNED_KEY_REQUEST_TYPE,
   SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN,
   bytesToHexString,
-} from '@farcaster/hub-web';
-import { Cog6ToothIcon } from '@heroicons/react/20/solid';
-import { config } from '@/common/helpers/rainbowkit';
-import { getDeadline, getUsernameForFid, isValidSignedKeyRequest } from '@/common/helpers/farcaster';
-import { writeContract } from '@wagmi/core';
-import { generateKeyPair } from '@/common/helpers/warpcastLogin';
-import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts';
-import { useAccountStore } from '@/stores/useAccountStore';
-import { useDraftStore } from '@/stores/useDraftStore';
-import { JoinedHerocastViaHatsProtocolDraft } from '../constants/postDrafts';
-import { useRouter } from 'next/router';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { isValidSignature, isValidSigner } from '@/lib/hats';
-import { SIGNED_KEY_REQUEST_TYPEHASH } from '@/lib/hats';
-import SwitchWalletButton from '@/common/components/SwitchWalletButton';
+} from '@farcaster/hub-web'
+import { Cog6ToothIcon } from '@heroicons/react/20/solid'
+import { config } from '@/common/helpers/rainbowkit'
+import { getDeadline, getUsernameForFid, isValidSignedKeyRequest } from '@/common/helpers/farcaster'
+import { writeContract } from '@wagmi/core'
+import { generateKeyPair } from '@/common/helpers/warpcastLogin'
+import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts'
+import { useAccountStore } from '@/stores/useAccountStore'
+import { useDraftStore } from '@/stores/useDraftStore'
+import { JoinedHerocastViaHatsProtocolDraft } from '../constants/postDrafts'
+import { useRouter } from 'next/router'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { isValidSignature, isValidSigner } from '@/lib/hats'
+import { SIGNED_KEY_REQUEST_TYPEHASH } from '@/lib/hats'
+import SwitchWalletButton from '@/common/components/SwitchWalletButton'
 
 enum SignupStateEnum {
   'CONNECT_WALLET',
@@ -37,11 +37,11 @@ enum SignupStateEnum {
 }
 
 type SignupStepType = {
-  state: SignupStateEnum;
-  title: string;
-  description: string;
-  idx: number;
-};
+  state: SignupStateEnum
+  title: string
+  description: string
+  idx: number
+}
 
 const HatsProtocolSignupSteps: SignupStepType[] = [
   {
@@ -81,87 +81,87 @@ const HatsProtocolSignupSteps: SignupStepType[] = [
     description: 'Something went wrong',
     idx: 5,
   },
-];
+]
 
-const APP_FID = process.env.NEXT_PUBLIC_APP_FID!;
+const APP_FID = process.env.NEXT_PUBLIC_APP_FID!
 
 const ConnectFarcasterAccountViaHatsProtocol = () => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const [state, setState] = useState<SignupStepType>(HatsProtocolSignupSteps[0]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [accountName, setAccountName] = useState('');
-  const [deadline, setDeadline] = useState<bigint>(BigInt(0));
-  const [delegatorContractAddress, setDelegatorContractAddress] = useState<`0x${string}` | undefined>();
-  const [fid, setFid] = useState<bigint>(BigInt(0));
-  const [onchainTransactionHash, setOnchainTransactionHash] = useState<`0x${string}`>('0x');
+  const [state, setState] = useState<SignupStepType>(HatsProtocolSignupSteps[0])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [accountName, setAccountName] = useState('')
+  const [deadline, setDeadline] = useState<bigint>(BigInt(0))
+  const [delegatorContractAddress, setDelegatorContractAddress] = useState<`0x${string}` | undefined>()
+  const [fid, setFid] = useState<bigint>(BigInt(0))
+  const [onchainTransactionHash, setOnchainTransactionHash] = useState<`0x${string}`>('0x')
 
-  const { addNewPostDraft } = useDraftStore();
+  const { addNewPostDraft } = useDraftStore()
 
-  const { address } = useAccount();
-  const { openConnectModal } = useConnectModal();
-  const { signTypedDataAsync } = useSignTypedData();
+  const { address } = useAccount()
+  const { openConnectModal } = useConnectModal()
+  const { signTypedDataAsync } = useSignTypedData()
 
-  const { accounts, addAccount, setAccountActive } = useAccountStore();
+  const { accounts, addAccount, setAccountActive } = useAccountStore()
   const hatsProtocolPendingAccounts = accounts.filter(
     (account) =>
       account.status === AccountStatusType.pending && account.platform === AccountPlatformType.farcaster_hats_protocol
-  );
+  )
 
   const getFidForUsername = async (username: string) => {
-    const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+    const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
     try {
-      const resp = await neynarClient.lookupUserByUsername(accountName, parseInt(APP_FID));
-      return resp.result.user?.fid;
+      const resp = await neynarClient.lookupUserByUsername(accountName, parseInt(APP_FID))
+      return resp.result.user?.fid
     } catch (err) {
-      console.log('ConnectFarcasterAccountViaHatsProtocol: error getting data', err);
+      console.log('ConnectFarcasterAccountViaHatsProtocol: error getting data', err)
     }
-  };
+  }
 
   const onSignData = async () => {
-    if (!address) return;
+    if (!address) return
 
     const hasConnectedValidSignerAddress = await isValidSigner(
       delegatorContractAddress!,
       SIGNED_KEY_REQUEST_TYPEHASH,
       address
-    );
+    )
 
     if (!hasConnectedValidSignerAddress) {
-      setErrorMessage(`Address ${address} is not a valid signer for contract ${delegatorContractAddress}`);
-      setState(HatsProtocolSignupSteps[5]);
-      return;
+      setErrorMessage(`Address ${address} is not a valid signer for contract ${delegatorContractAddress}`)
+      setState(HatsProtocolSignupSteps[5])
+      return
     }
 
-    setState(HatsProtocolSignupSteps[2]);
+    setState(HatsProtocolSignupSteps[2])
 
-    let fid: number | undefined;
-    const isNumeric = /^-?\d+$/.test(accountName);
+    let fid: number | undefined
+    const isNumeric = /^-?\d+$/.test(accountName)
     if (isNumeric) {
-      fid = Number(accountName);
+      fid = Number(accountName)
     } else {
-      fid = await getFidForUsername(accountName);
+      fid = await getFidForUsername(accountName)
     }
-    console.log('fid', fid);
+    console.log('fid', fid)
     if (!fid) {
-      setErrorMessage(`User ${accountName} not found`);
-      return;
+      setErrorMessage(`User ${accountName} not found`)
+      return
     }
 
-    setFid(BigInt(fid));
-    const newDeadline = BigInt(getDeadline());
-    setDeadline(newDeadline);
-    setState(HatsProtocolSignupSteps[3]);
-  };
+    setFid(BigInt(fid))
+    const newDeadline = BigInt(getDeadline())
+    setDeadline(newDeadline)
+    setState(HatsProtocolSignupSteps[3])
+  }
 
   const onAddHerocastSignerToHatsProtocol = async () => {
-    if (!address || !delegatorContractAddress) return;
+    if (!address || !delegatorContractAddress) return
 
-    let hexStringPublicKey: `0x${string}`, hexStringPrivateKey: `0x${string}`;
+    let hexStringPublicKey: `0x${string}`, hexStringPrivateKey: `0x${string}`
     if (!hatsProtocolPendingAccounts || hatsProtocolPendingAccounts.length === 0) {
-      const { publicKey, privateKey } = await generateKeyPair();
-      hexStringPublicKey = bytesToHexString(publicKey)._unsafeUnwrap();
-      hexStringPrivateKey = bytesToHexString(privateKey)._unsafeUnwrap();
+      const { publicKey, privateKey } = await generateKeyPair()
+      hexStringPublicKey = bytesToHexString(publicKey)._unsafeUnwrap()
+      hexStringPrivateKey = bytesToHexString(privateKey)._unsafeUnwrap()
 
       try {
         await addAccount({
@@ -173,15 +173,15 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
             privateKey: hexStringPrivateKey,
             data: {},
           },
-        });
+        })
       } catch (e) {
-        console.log('error when trying to add account', e);
-        setState(HatsProtocolSignupSteps[5]);
-        return;
+        console.log('error when trying to add account', e)
+        setState(HatsProtocolSignupSteps[5])
+        return
       }
     } else {
-      hexStringPublicKey = hatsProtocolPendingAccounts[0].publicKey!;
-      hexStringPrivateKey = hatsProtocolPendingAccounts[0].privateKey!;
+      hexStringPublicKey = hatsProtocolPendingAccounts[0].publicKey!
+      hexStringPrivateKey = hatsProtocolPendingAccounts[0].privateKey!
     }
 
     const typedMetadataData = {
@@ -195,14 +195,14 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
         key: hexStringPublicKey,
         deadline: deadline,
       },
-    };
-    const metadataHash = hashTypedData(typedMetadataData);
-    const metadataSignature = await signTypedDataAsync(typedMetadataData);
+    }
+    const metadataHash = hashTypedData(typedMetadataData)
+    const metadataSignature = await signTypedDataAsync(typedMetadataData)
 
     const hatsProtocolSignature = encodePacked(
       ['bytes', 'bytes32', 'uint256', 'bytes', 'uint256'],
       [metadataSignature, SIGNED_KEY_REQUEST_TYPEHASH, fid, keccak256(hexStringPublicKey), deadline]
-    );
+    )
 
     const metadata = encodeAbiParameters(
       [
@@ -236,7 +236,7 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
           deadline,
         },
       ]
-    );
+    )
     try {
       // console.log('isMetadataSignatureValid', await isValidSignature(delegatorContractAddress, metadataHash, metadata));
       // const isValidSignedKeyReq = await isValidSignedKeyRequest(
@@ -251,97 +251,97 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
         address: delegatorContractAddress,
         functionName: 'addKey',
         args: [1, hexStringPublicKey, 1, metadata],
-      });
-      setOnchainTransactionHash(tx);
-      console.log('result tx', tx);
+      })
+      setOnchainTransactionHash(tx)
+      console.log('result tx', tx)
     } catch (e) {
-      console.error('error when trying to add key', e);
-      setErrorMessage(`Failed to add key ${e}`);
-      setState(HatsProtocolSignupSteps[5]);
+      console.error('error when trying to add key', e)
+      setErrorMessage(`Failed to add key ${e}`)
+      setState(HatsProtocolSignupSteps[5])
     }
-  };
+  }
 
   const transactionResult = useWaitForTransactionReceipt({
     hash: onchainTransactionHash,
-  });
+  })
 
   useEffect(() => {
     const activateAccount = async () => {
-      setState(HatsProtocolSignupSteps[4]);
-      const username = await getUsernameForFid(Number(fid));
+      setState(HatsProtocolSignupSteps[4])
+      const username = await getUsernameForFid(Number(fid))
       setAccountActive(hatsProtocolPendingAccounts[0].id, username, {
         platform_account_id: fid.toString(),
         data: {},
-      });
-    };
+      })
+    }
 
-    if (onchainTransactionHash === '0x') return;
+    if (onchainTransactionHash === '0x') return
 
     if (transactionResult && hatsProtocolPendingAccounts.length > 0) {
-      activateAccount();
+      activateAccount()
     }
-  }, [onchainTransactionHash, transactionResult]);
+  }, [onchainTransactionHash, transactionResult])
 
   const onPublishTestCast = async () => {
-    addNewPostDraft(JoinedHerocastViaHatsProtocolDraft);
-    router.push('/post');
-  };
+    addNewPostDraft(JoinedHerocastViaHatsProtocolDraft)
+    router.push('/post')
+  }
 
   const getButtonLabel = () => {
     switch (state.state) {
       case SignupStateEnum.CONNECT_WALLET:
-        return 'Connect wallet';
+        return 'Connect wallet'
       case SignupStateEnum.SELECT_FARCASTER_ACCOUNT:
-        return `Connect to ${accountName || 'Farcaster account'}`;
+        return `Connect to ${accountName || 'Farcaster account'}`
       case SignupStateEnum.CHECKING_IS_VALID_SIGNER:
         return (
           <p className="flex">
             <Cog6ToothIcon className="h-5 w-5 text-foreground/80 animate-spin" aria-hidden="true" />
           </p>
-        );
+        )
       case SignupStateEnum.CONFIRMED_IS_VALID_SIGNER:
-        return 'Do I need to sign again?';
+        return 'Do I need to sign again?'
       case SignupStateEnum.PENDING_ADD_KEY:
-        return 'Confirm herocast signer';
+        return 'Confirm herocast signer'
       case SignupStateEnum.CONFIRMED_ADD_KEY:
-        return null;
+        return null
       case SignupStateEnum.ERROR:
-        return 'Restart';
+        return 'Restart'
     }
-  };
+  }
 
   useEffect(() => {
     if (state.state === SignupStateEnum.CONNECT_WALLET && address) {
-      setState(HatsProtocolSignupSteps[1]);
+      setState(HatsProtocolSignupSteps[1])
     }
-  }, [address]);
+  }, [address])
 
   const onClick = () => {
     switch (state.state) {
       case SignupStateEnum.CONNECT_WALLET:
         if (!address) {
-          openConnectModal?.();
+          openConnectModal?.()
         } else {
-          setState(HatsProtocolSignupSteps[1]);
+          setState(HatsProtocolSignupSteps[1])
         }
-        break;
+        break
       case SignupStateEnum.SELECT_FARCASTER_ACCOUNT:
-        if (!address || !accountName || delegatorContractAddress === '0x') return;
+        if (!address || !accountName || delegatorContractAddress === '0x') return
 
-        onSignData();
-        break;
+        onSignData()
+        break
       case SignupStateEnum.CONFIRMED_IS_VALID_SIGNER:
       case SignupStateEnum.CHECKING_IS_VALID_SIGNER:
-        break;
+        break
       case SignupStateEnum.PENDING_ADD_KEY:
-        onAddHerocastSignerToHatsProtocol();
-        break;
+        onAddHerocastSignerToHatsProtocol()
+        break
       case SignupStateEnum.ERROR:
-        setState(HatsProtocolSignupSteps[0]);
-        setErrorMessage('');
-        break;
+        setState(HatsProtocolSignupSteps[0])
+        setErrorMessage('')
+        break
     }
-  };
+  }
 
   const getCardContent = () => {
     switch (state.state) {
@@ -367,7 +367,7 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
               />
             </div>
           </div>
-        );
+        )
       case SignupStateEnum.CHECKING_IS_VALID_SIGNER:
         return (
           <div className="flex flex-col">
@@ -379,7 +379,7 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
               </p>
             </div>
           </div>
-        );
+        )
       case SignupStateEnum.CONFIRMED_ADD_KEY:
         return (
           <div className="flex flex-col">
@@ -390,13 +390,13 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
               </Button>
             </div>
           </div>
-        );
+        )
       default:
-        return <></>;
+        return <></>
     }
-  };
+  }
 
-  const buttonLabel = getButtonLabel();
+  const buttonLabel = getButtonLabel()
   return (
     <div className="flex max-w-full lg:max-w-xl">
       <Card>
@@ -431,7 +431,7 @@ const ConnectFarcasterAccountViaHatsProtocol = () => {
         </CardFooter>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default ConnectFarcasterAccountViaHatsProtocol;
+export default ConnectFarcasterAccountViaHatsProtocol

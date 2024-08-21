@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { ParagraphXyzArticleType, getParagraphXyzArticle } from '../../helpers/paragraph';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { openWindow } from '@/common/helpers/navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useEffect, useState } from 'react'
+import { ParagraphXyzArticleType, getParagraphXyzArticle } from '../../helpers/paragraph'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { openWindow } from '@/common/helpers/navigation'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 type ParagraphXyzEmbedProps = {
-  url: string;
-};
+  url: string
+}
 
 const ParagraphXyzEmbed: React.FC<ParagraphXyzEmbedProps> = ({ url }) => {
-  const [data, setData] = useState<ParagraphXyzArticleType>();
+  const [data, setData] = useState<ParagraphXyzArticleType>()
 
   useEffect(() => {
     const getData = async () => {
-      const resp = await getParagraphXyzArticle(url);
+      const resp = await getParagraphXyzArticle(url)
       if (resp) {
-        setData(resp);
+        setData(resp)
       }
-    };
+    }
 
-    getData();
-  }, []);
+    getData()
+  }, [])
 
   if (!data) {
-    return;
+    return
   }
 
   const renderPost = () => (
@@ -55,7 +55,7 @@ const ParagraphXyzEmbed: React.FC<ParagraphXyzEmbedProps> = ({ url }) => {
         <div>Read more on Pargraph →</div>
       </CardFooter>
     </Card>
-  );
+  )
 
   const renderPublication = () => (
     <Card>
@@ -87,18 +87,18 @@ const ParagraphXyzEmbed: React.FC<ParagraphXyzEmbedProps> = ({ url }) => {
         <p>Read more on Pargraph</p>
       </CardFooter>
     </Card>
-  );
+  )
 
   const renderData = () => {
     if (data.post) {
-      return renderPost();
+      return renderPost()
     } else if (data.publication) {
-      return renderPublication();
+      return renderPublication()
     } else {
-      return <p className="text-sm text-foreground/80">{url}</p>;
+      return <p className="text-sm text-foreground/80">{url}</p>
     }
-  };
-  return <div key={`paragraph-xyz-embed-${url}`}>{renderData()}</div>;
-};
+  }
+  return <div key={`paragraph-xyz-embed-${url}`}>{renderData()}</div>
+}
 
-export default ParagraphXyzEmbed;
+export default ParagraphXyzEmbed

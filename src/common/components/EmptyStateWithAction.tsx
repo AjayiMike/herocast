@@ -1,14 +1,14 @@
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import { Button } from '@/components/ui/button'
+import React from 'react'
 
 type EmptyStateWithActionProps = {
-  title: string;
-  description: string;
-  hideButton?: boolean;
-  icon?: React.ComponentType<{ className: string }>;
-  submitText: string;
-  onClick: () => void;
-};
+  title: string
+  description: string
+  hideButton?: boolean
+  icon?: React.ComponentType<{ className: string }>
+  submitText: string
+  onClick: () => void
+}
 
 export default function EmptyStateWithAction({
   title,
@@ -31,5 +31,5 @@ export default function EmptyStateWithAction({
         </div>
       )}
     </div>
-  );
+  )
 }

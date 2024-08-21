@@ -1,51 +1,51 @@
-import React, { useState } from 'react';
-import { SidebarHeader } from './SidebarHeader';
-import { useListStore } from '@/stores/useListStore';
-import sortBy from 'lodash.sortby';
-import { List } from '@/common/types/database.types';
+import React, { useState } from 'react'
+import { SidebarHeader } from './SidebarHeader'
+import { useListStore } from '@/stores/useListStore'
+import sortBy from 'lodash.sortby'
+import { List } from '@/common/types/database.types'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 import {
   EllipsisVerticalIcon,
   MagnifyingGlassIcon,
   Cog6ToothIcon,
   BellIcon,
   EnvelopeIcon,
-} from '@heroicons/react/24/outline';
-import { useNavigationStore } from '@/stores/useNavigationStore';
-import { UUID } from 'crypto';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAccountStore } from '@/stores/useAccountStore';
-import UpgradeFreePlanCard from '../UpgradeFreePlanCard';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { PlusIcon } from '@heroicons/react/24/solid';
+} from '@heroicons/react/24/outline'
+import { useNavigationStore } from '@/stores/useNavigationStore'
+import { UUID } from 'crypto'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAccountStore } from '@/stores/useAccountStore'
+import UpgradeFreePlanCard from '../UpgradeFreePlanCard'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { PlusIcon } from '@heroicons/react/24/solid'
 
 type ListsOverviewProps = {
-  hideHeader?: boolean;
-  collapsible?: boolean;
-};
+  hideHeader?: boolean
+  collapsible?: boolean
+}
 
 const ListsOverview = () => {
-  const { selectedListId, setSelectedListId } = useListStore();
+  const { selectedListId, setSelectedListId } = useListStore()
   const lists = sortBy(
     useListStore((state) => state.lists),
     (s) => s.idx
-  );
-  const { setSelectedChannelUrl } = useAccountStore();
-  const [isShowAllLists, setIsShowAllLists] = useState(true);
+  )
+  const { setSelectedChannelUrl } = useAccountStore()
+  const [isShowAllLists, setIsShowAllLists] = useState(true)
 
   const updateSelectedList = (id: UUID) => {
-    setSelectedListId(id);
-    setSelectedChannelUrl(null);
-  };
+    setSelectedListId(id)
+    setSelectedChannelUrl(null)
+  }
 
   const renderFeedHeader = (title: string, button?) => {
     return (
@@ -53,11 +53,11 @@ const ListsOverview = () => {
         <h3 className="mr-2 text-md font-semibold leading-7 tracking-tight text-primary">{title}</h3>
         {button}
       </div>
-    );
-  };
+    )
+  }
 
   const renderList = (list: List & { id: UUID }) => {
-    const isSelected = selectedListId === list.id;
+    const isSelected = selectedListId === list.id
 
     return (
       <li key={`list-${list.id}`}>
@@ -71,8 +71,8 @@ const ListsOverview = () => {
           <span className="flex-nowrap truncate">{list.name}</span>
         </div>
       </li>
-    );
-  };
+    )
+  }
 
   const renderLists = () => (
     <div className="flex flex-col">
@@ -90,7 +90,7 @@ const ListsOverview = () => {
         </Collapsible>
       </ul>
     </div>
-  );
+  )
 
   const renderAddFirstSearchButton = () => (
     <Link href="/search" className="px-4 py-3 sm:px-4 sm:py-3">
@@ -98,9 +98,9 @@ const ListsOverview = () => {
         Add keyword search
       </Button>
     </Link>
-  );
+  )
 
-  const hasLists = lists.length > 0;
+  const hasLists = lists.length > 0
 
   return (
     <div className="">
@@ -114,7 +114,7 @@ const ListsOverview = () => {
       )}
       {hasLists ? renderLists() : renderAddFirstSearchButton()}
     </div>
-  );
-};
+  )
+}
 
-export default ListsOverview;
+export default ListsOverview

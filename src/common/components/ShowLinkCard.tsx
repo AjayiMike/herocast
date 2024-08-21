@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { openWindow } from '../helpers/navigation';
+import React, { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { openWindow } from '../helpers/navigation'
 
 type ShowLinkCardProps = {
-  title: string;
-  description: string;
-  link: string;
-  buttonLabel: string;
-};
+  title: string
+  description: string
+  link: string
+  buttonLabel: string
+}
 
 const ShowLinkCard = ({ title, description, link, buttonLabel }: ShowLinkCardProps) => (
   <Card>
@@ -30,6 +30,6 @@ const ShowLinkCard = ({ title, description, link, buttonLabel }: ShowLinkCardPro
       </div>
     </CardContent>
   </Card>
-);
+)
 
-export default ShowLinkCard;
+export default ShowLinkCard

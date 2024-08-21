@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
 const usePollingUpdate = (pollingFunction: (() => void) | null, interval: number) => {
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState(null)
 
   useEffect(() => {
-    if (!pollingFunction) return;
+    if (!pollingFunction) return
 
-    const id = setInterval(pollingFunction, interval);
-    setSubscription(id);
+    const id = setInterval(pollingFunction, interval)
+    setSubscription(id)
     return () => {
       if (subscription) {
-        clearInterval(subscription);
+        clearInterval(subscription)
       }
-    };
-  }, [pollingFunction]);
-};
+    }
+  }, [pollingFunction])
+}
 
-export default usePollingUpdate;
+export default usePollingUpdate

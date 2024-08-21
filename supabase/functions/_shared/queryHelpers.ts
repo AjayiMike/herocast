@@ -1,4 +1,4 @@
-import { sql } from 'kysely';
+import { sql } from 'kysely'
 
 export function buildAnalyticsQuery(
   tableName: string,
@@ -12,16 +12,16 @@ export function buildAnalyticsQuery(
           additionalColumns.map((col) => sql.raw(col)),
           sql`, `
         )}`
-      : sql``;
+      : sql``
   const additionalColumnsGroupBy =
     additionalColumns.length > 0
       ? sql`, ${sql.join(
           additionalColumns.map((col) => sql.raw(col.split(' ').pop()!)),
           sql`, `
         )}`
-      : sql``;
+      : sql``
 
-  console.log('buildAnalyticsQuery', fid, tableName, additionalColumns);
+  console.log('buildAnalyticsQuery', fid, tableName, additionalColumns)
 
   return sql`
         WITH daily_counts AS (
@@ -41,7 +41,7 @@ export function buildAnalyticsQuery(
             SUM(CASE WHEN day >= NOW() - INTERVAL '30 days' THEN count ELSE 0 END) AS d30,
             json_agg(json_build_object('timestamp', day, 'count', count) ORDER BY day) AS aggregated
         FROM daily_counts
-    `;
+    `
 }
 
 export function getTopCasts(fid: number, limit: number = 30) {
@@ -74,7 +74,7 @@ export function getTopCasts(fid: number, limit: number = 30) {
         ORDER BY 
             COALESCE(like_count::int, 0) DESC
         LIMIT ${limit};
-    `;
+    `
 }
 
 export const formatResponseSection = (data: any) => ({
@@ -85,4 +85,4 @@ export const formatResponseSection = (data: any) => ({
     h24: data.h24,
     d30: data.d30,
   },
-});
+})

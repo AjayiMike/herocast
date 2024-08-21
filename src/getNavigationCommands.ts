@@ -1,12 +1,12 @@
-import { NextRouter } from 'next/router';
-import { CommandType } from './common/constants/commands';
-import { ChartBarIcon, MagnifyingGlassIcon, RectangleGroupIcon } from '@heroicons/react/20/solid';
-import { BellIcon } from '@heroicons/react/24/outline';
-import { Bars3BottomLeftIcon } from '@heroicons/react/20/solid';
-import { Cog6ToothIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+import { NextRouter } from 'next/router'
+import { CommandType } from './common/constants/commands'
+import { ChartBarIcon, MagnifyingGlassIcon, RectangleGroupIcon } from '@heroicons/react/20/solid'
+import { BellIcon } from '@heroicons/react/24/outline'
+import { Bars3BottomLeftIcon } from '@heroicons/react/20/solid'
+import { Cog6ToothIcon, UserPlusIcon } from '@heroicons/react/24/outline'
 
 interface WithRouterProps {
-  router: NextRouter;
+  router: NextRouter
 }
 
 export const getNavigationCommands = ({ router }: WithRouterProps): CommandType[] => [
@@ -89,4 +89,4 @@ export const getNavigationCommands = ({ router }: WithRouterProps): CommandType[
       enableOnFormTags: false,
     },
   },
-];
+]

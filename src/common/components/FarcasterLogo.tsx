@@ -1,5 +1,5 @@
-import React from 'react';
-import clsx from 'clsx';
+import React from 'react'
+import clsx from 'clsx'
 
 const FarcasterLogo = (className?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 1024 1024" fill="none">
@@ -9,6 +9,6 @@ const FarcasterLogo = (className?: string) => (
       className={clsx(className, 'fill-muted-foreground')}
     ></path>
   </svg>
-);
+)
 
-export default FarcasterLogo;
+export default FarcasterLogo

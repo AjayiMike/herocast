@@ -1,76 +1,76 @@
-import React, { useEffect, useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { UserDataType } from '@farcaster/hub-web';
-import { setUserDataInProtocol } from '@/common/helpers/farcaster';
-import { AccountObjectType } from '@/stores/useAccountStore';
-import { Cog6ToothIcon } from '@heroicons/react/20/solid';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+import React, { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import { UserDataType } from '@farcaster/hub-web'
+import { setUserDataInProtocol } from '@/common/helpers/farcaster'
+import { AccountObjectType } from '@/stores/useAccountStore'
+import { Cog6ToothIcon } from '@heroicons/react/20/solid'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
 
-type ChangeDisplayNameFormValues = z.infer<typeof ChangeDisplayNameFormSchema>;
+type ChangeDisplayNameFormValues = z.infer<typeof ChangeDisplayNameFormSchema>
 
-const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!);
+const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!)
 
 const validateMaxBytes32 = (value: string) => {
-  return new TextEncoder().encode(value).length <= 32;
-};
+  return new TextEncoder().encode(value).length <= 32
+}
 
 const ChangeDisplayNameFormSchema = z.object({
   displayName: z.string().refine(validateMaxBytes32, {
     message: 'Display name must not be longer than 32 bytes.',
   }),
-});
+})
 
 type ChangeDisplayNameFormProps = {
-  account: AccountObjectType;
-  onSuccess?: () => void;
-};
+  account: AccountObjectType
+  onSuccess?: () => void
+}
 
 const ChangeDisplayNameForm = ({ account, onSuccess }: ChangeDisplayNameFormProps) => {
-  const [isPending, setIsPending] = useState(false);
-  const [userInProtocol, setUserInProtocol] = useState<User>();
+  const [isPending, setIsPending] = useState(false)
+  const [userInProtocol, setUserInProtocol] = useState<User>()
 
   const form = useForm<ChangeDisplayNameFormValues>({
     resolver: zodResolver(ChangeDisplayNameFormSchema),
     mode: 'onSubmit',
-  });
-  const canSubmitForm = !isPending && userInProtocol;
+  })
+  const canSubmitForm = !isPending && userInProtocol
 
   useEffect(() => {
     const getUserInProtocol = async () => {
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
       const user = (await neynarClient.fetchBulkUsers([Number(account.platformAccountId!)], { viewerFid: APP_FID }))
-        .users[0];
+        .users[0]
       if (user) {
-        setUserInProtocol(user);
+        setUserInProtocol(user)
       }
-    };
+    }
 
     if (account.platformAccountId) {
-      getUserInProtocol();
+      getUserInProtocol()
     }
-  }, [account.platformAccountId]);
+  }, [account.platformAccountId])
 
   const changeDisplayName = async (data) => {
-    if (!userInProtocol) return;
+    if (!userInProtocol) return
 
-    const { displayName } = data;
+    const { displayName } = data
 
     if (displayName === userInProtocol?.display_name) {
       form.setError('displayName', {
         type: 'manual',
         message: 'Please enter a new display name.',
-      });
-      return;
+      })
+      return
     }
 
-    setIsPending(true);
+    setIsPending(true)
 
     try {
       await setUserDataInProtocol(
@@ -78,22 +78,22 @@ const ChangeDisplayNameForm = ({ account, onSuccess }: ChangeDisplayNameFormProp
         Number(account.platformAccountId!),
         UserDataType.DISPLAY,
         displayName
-      );
+      )
       toast.success('Display name changed successfully', {
         duration: 5000,
         closeButton: true,
-      });
-      onSuccess?.();
+      })
+      onSuccess?.()
     } catch (e) {
-      console.error('ChangeDisplayName error', e);
+      console.error('ChangeDisplayName error', e)
       form.setError('displayName', {
         type: 'manual',
         message: `Error setting displayName -> ${e}`,
-      });
+      })
     } finally {
-      setIsPending(false);
+      setIsPending(false)
     }
-  };
+  }
 
   const renderForm = () => (
     <Form {...form}>
@@ -122,9 +122,9 @@ const ChangeDisplayNameForm = ({ account, onSuccess }: ChangeDisplayNameFormProp
         </Button>
       </form>
     </Form>
-  );
+  )
 
-  return <div className="flex flex-col gap-y-4">{renderForm()}</div>;
-};
+  return <div className="flex flex-col gap-y-4">{renderForm()}</div>
+}
 
-export default ChangeDisplayNameForm;
+export default ChangeDisplayNameForm

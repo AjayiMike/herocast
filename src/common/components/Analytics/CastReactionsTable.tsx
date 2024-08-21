@@ -1,31 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { CastRow } from '@/common/components/CastRow';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { CastData } from '@/common/types/types';
-import orderBy from 'lodash.orderby';
+import React, { useEffect, useState } from 'react'
+import { CastRow } from '@/common/components/CastRow'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { CastData } from '@/common/types/types'
+import orderBy from 'lodash.orderby'
 
 interface CastReactionsTableProps {
-  rawCasts: CastData[];
+  rawCasts: CastData[]
 }
 
 const CastReactionsTable = ({ rawCasts }: CastReactionsTableProps) => {
-  const [casts, setCasts] = useState<CastWithInteractions[]>([]);
+  const [casts, setCasts] = useState<CastWithInteractions[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
-      const hashes = rawCasts.map((cast: any) => cast.hash);
-      const castsResponse = await neynarClient.fetchBulkCasts(hashes);
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
+      const hashes = rawCasts.map((cast: any) => cast.hash)
+      const castsResponse = await neynarClient.fetchBulkCasts(hashes)
       if (castsResponse.result.casts) {
-        setCasts(orderBy(castsResponse.result.casts, 'reactions.likes_count', 'desc'));
+        setCasts(orderBy(castsResponse.result.casts, 'reactions.likes_count', 'desc'))
       }
-    };
+    }
 
     if (rawCasts?.length) {
-      fetchData();
+      fetchData()
     }
-  }, [rawCasts]);
+  }, [rawCasts])
 
   return (
     <div className="overflow-x-auto">
@@ -52,7 +52,7 @@ const CastReactionsTable = ({ rawCasts }: CastReactionsTableProps) => {
         </tbody>
       </table>
     </div>
-  );
-};
+  )
+}
 
-export default CastReactionsTable;
+export default CastReactionsTable

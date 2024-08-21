@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   CheckCircleIcon,
   MagnifyingGlassIcon,
@@ -6,22 +6,22 @@ import {
   PencilSquareIcon,
   PlusCircleIcon,
   RectangleGroupIcon,
-} from '@heroicons/react/20/solid';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/router';
-import { useDraftStore } from '@/stores/useDraftStore';
-import { JoinedHerocastPostDraft } from '@/common/constants/postDrafts';
-import Link from 'next/link';
+} from '@heroicons/react/20/solid'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/router'
+import { useDraftStore } from '@/stores/useDraftStore'
+import { JoinedHerocastPostDraft } from '@/common/constants/postDrafts'
+import Link from 'next/link'
 
 const WelcomeSuccessPage = () => {
-  const router = useRouter();
-  const { addNewPostDraft } = useDraftStore();
+  const router = useRouter()
+  const { addNewPostDraft } = useDraftStore()
 
   const onStartCasting = () => {
-    addNewPostDraft(JoinedHerocastPostDraft);
-    router.push('/post');
-  };
+    addNewPostDraft(JoinedHerocastPostDraft)
+    router.push('/post')
+  }
   return (
     <div className="w-full flex flex-col mt-24 items-center">
       <div className="space-y-6 p-10 pb-16 block text-center">
@@ -68,7 +68,7 @@ const WelcomeSuccessPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default WelcomeSuccessPage;
+export default WelcomeSuccessPage

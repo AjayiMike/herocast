@@ -1,21 +1,21 @@
-import React, { useEffect, useRef } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { Key } from 'ts-key-enum';
-import { useInView } from 'react-intersection-observer';
-import isEmpty from 'lodash.isempty';
+import React, { useEffect, useRef } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { Key } from 'ts-key-enum'
+import { useInView } from 'react-intersection-observer'
+import isEmpty from 'lodash.isempty'
 
 type SelectableListWithHotkeysProps = {
-  data: any[];
-  renderRow: (item: any, idx: number) => React.ReactNode;
-  selectedIdx: number;
-  setSelectedIdx: (idx: number) => void;
-  onSelect?: (idx: number) => void;
-  disableScroll?: boolean;
-  onExpand?: (idx: number) => void;
-  isActive?: boolean;
-  onDown?: () => void;
-  onUp?: () => void;
-};
+  data: any[]
+  renderRow: (item: any, idx: number) => React.ReactNode
+  selectedIdx: number
+  setSelectedIdx: (idx: number) => void
+  onSelect?: (idx: number) => void
+  disableScroll?: boolean
+  onExpand?: (idx: number) => void
+  isActive?: boolean
+  onDown?: () => void
+  onUp?: () => void
+}
 
 export const SelectableListWithHotkeys = ({
   data,
@@ -32,74 +32,74 @@ export const SelectableListWithHotkeys = ({
   const { ref, inView } = useInView({
     threshold: 0,
     delay: 100,
-  });
+  })
 
-  const scollToRef = useRef();
+  const scollToRef = useRef()
   // scroll to selected cast when selectedCastIdx changes
   useEffect(() => {
     if (!disableScroll && scollToRef.current) {
-      (scollToRef.current as HTMLElement).scrollIntoView({
+      ;(scollToRef.current as HTMLElement).scrollIntoView({
         behavior: 'auto',
         block: 'start',
-      });
+      })
     }
-  }, [selectedIdx]);
+  }, [selectedIdx])
 
   useHotkeys(
     ['o', Key.Enter],
     () => {
-      onSelect?.(selectedIdx);
+      onSelect?.(selectedIdx)
     },
     [selectedIdx],
     {
       enabled: isActive,
     }
-  );
+  )
 
   useHotkeys(
     'shift+o',
     () => {
-      onExpand && onExpand(selectedIdx);
+      onExpand && onExpand(selectedIdx)
     },
     [selectedIdx],
     {
       enabled: onExpand !== undefined && isActive,
     }
-  );
+  )
 
   useHotkeys(
     ['j', Key.ArrowDown],
     () => {
-      onDown?.();
+      onDown?.()
 
       if (selectedIdx < data.length - 1) {
-        setSelectedIdx(selectedIdx + 1);
+        setSelectedIdx(selectedIdx + 1)
       }
     },
     [data, selectedIdx, setSelectedIdx],
     {
       enabled: isActive && !isEmpty(data),
     }
-  );
+  )
 
   useHotkeys(
     ['k', Key.ArrowUp],
     () => {
-      onUp?.();
+      onUp?.()
 
       if (selectedIdx === 0) {
-        return;
+        return
       }
 
-      setSelectedIdx(selectedIdx - 1);
+      setSelectedIdx(selectedIdx - 1)
     },
     [data, selectedIdx, setSelectedIdx],
     {
       enabled: isActive && !isEmpty(data),
     }
-  );
+  )
 
-  if (isEmpty(data)) return null;
+  if (isEmpty(data)) return null
 
   return (
     <ul role="list" className="">
@@ -111,9 +111,9 @@ export const SelectableListWithHotkeys = ({
           >
             {renderRow(item, idx)}
           </div>
-        ) : null;
+        ) : null
       })}
       <li ref={ref} className="" />
     </ul>
-  );
-};
+  )
+}

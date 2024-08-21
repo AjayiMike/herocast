@@ -1,83 +1,83 @@
-import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { take } from 'lodash';
-import { useEffect } from 'react';
-import uniqBy from 'lodash.uniqby';
-import { Channel } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { PersonIcon } from '@radix-ui/react-icons';
-import { formatLargeNumber } from '../helpers/text';
-import Fuse from 'fuse.js';
-import map from 'lodash.map';
-import orderBy from 'lodash.orderby';
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { take } from 'lodash'
+import { useEffect } from 'react'
+import uniqBy from 'lodash.uniqby'
+import { Channel } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { PersonIcon } from '@radix-ui/react-icons'
+import { formatLargeNumber } from '../helpers/text'
+import Fuse from 'fuse.js'
+import map from 'lodash.map'
+import orderBy from 'lodash.orderby'
 
 type Props = {
-  getChannels: (query: string) => Promise<Channel[]>;
-  getAllChannels: () => Promise<Channel[]>;
-  onSelect: (value: Channel) => void;
-  value: Channel;
-  initialChannels?: Channel[];
-  disabled?: boolean;
-};
+  getChannels: (query: string) => Promise<Channel[]>
+  getAllChannels: () => Promise<Channel[]>
+  onSelect: (value: Channel) => void
+  value: Channel
+  initialChannels?: Channel[]
+  disabled?: boolean
+}
 
 export function ChannelPicker(props: Props) {
-  const { getChannels, getAllChannels, onSelect } = props;
-  const [query, setQuery] = React.useState('');
-  const [open, setOpen] = React.useState(false);
-  const [isPending, setIsPending] = React.useState(false);
+  const { getChannels, getAllChannels, onSelect } = props
+  const [query, setQuery] = React.useState('')
+  const [open, setOpen] = React.useState(false)
+  const [isPending, setIsPending] = React.useState(false)
 
-  const [channels, setChannels] = React.useState<Channel[]>(props.initialChannels ?? []);
+  const [channels, setChannels] = React.useState<Channel[]>(props.initialChannels ?? [])
 
   const setChannelResults = (newChannels: Channel[]) => {
-    setChannels(uniqBy(newChannels, 'parent_url'));
-  };
+    setChannels(uniqBy(newChannels, 'parent_url'))
+  }
 
   useEffect(() => {
     async function getChannelResults() {
-      if (query.length < 2) return;
+      if (query.length < 2) return
 
       try {
-        setIsPending(true);
-        setChannelResults(await getChannels(query));
+        setIsPending(true)
+        setChannelResults(await getChannels(query))
       } catch (e) {
-        console.error(e);
+        console.error(e)
       } finally {
-        setIsPending(false);
+        setIsPending(false)
       }
     }
 
-    getChannelResults();
-  }, [query, setChannels, getChannels]);
+    getChannelResults()
+  }, [query, setChannels, getChannels])
 
   useEffect(() => {
     async function getChannelResults() {
-      const channels = await getAllChannels();
-      setChannelResults(channels);
+      const channels = await getAllChannels()
+      setChannelResults(channels)
     }
 
-    getChannelResults();
-  }, [setChannels, getAllChannels]);
+    getChannelResults()
+  }, [setChannels, getAllChannels])
 
   const handleSelect = React.useCallback(
     (channel: Channel) => {
-      setOpen(false);
-      onSelect(channel);
+      setOpen(false)
+      onSelect(channel)
     },
     [onSelect, setOpen]
-  );
+  )
 
   const fuse = new Fuse(channels, {
     keys: ['name', 'url'],
-  });
+  })
   const filteredChannels = React.useMemo(() => {
-    if (channels.length === 0) return [];
+    if (channels.length === 0) return []
     if (!query) {
-      return take(channels, 7);
+      return take(channels, 7)
     }
 
-    return take(orderBy(map(fuse.search(query), 'item'), 'follower_count', 'desc'), 7);
-  }, [query, channels, fuse]);
+    return take(orderBy(map(fuse.search(query), 'item'), 'follower_count', 'desc'), 7)
+  }, [query, channels, fuse])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -134,5 +134,5 @@ export function ChannelPicker(props: Props) {
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

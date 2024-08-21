@@ -1,10 +1,10 @@
-import clsx from 'clsx';
-import React from 'react';
+import clsx from 'clsx'
+import React from 'react'
 
 interface LoadingProps {
-  className?: string;
-  isInline?: boolean;
-  loadingMessage?: string;
+  className?: string
+  isInline?: boolean
+  loadingMessage?: string
 }
 
 export const Loading = ({ className, isInline = false, loadingMessage = 'Loading' }: LoadingProps) =>
@@ -18,4 +18,4 @@ export const Loading = ({ className, isInline = false, loadingMessage = 'Loading
       {loadingMessage}
       <span className="animate-pulse">...</span>
     </p>
-  );
+  )

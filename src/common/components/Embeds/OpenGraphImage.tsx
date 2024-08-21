@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { openWindow } from '@/common/helpers/navigation';
+import React, { useEffect, useState } from 'react'
+import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { openWindow } from '@/common/helpers/navigation'
 
 type OpenGraphMetadata = {
   image: {
-    url: string;
-    height: number;
-    width: number;
-  };
-  description: string;
-  title: string;
-  publisher: string;
-};
+    url: string
+    height: number
+    width: number
+  }
+  description: string
+  title: string
+  publisher: string
+}
 
 const OpenGraphImage = ({ url }: { url: string }) => {
-  const [metadata, setMetadata] = useState<OpenGraphMetadata | null>(null);
+  const [metadata, setMetadata] = useState<OpenGraphMetadata | null>(null)
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -25,16 +25,16 @@ const OpenGraphImage = ({ url }: { url: string }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
-      const metadata = await request.json();
-      setMetadata(metadata[url]);
-    };
+      })
+      const metadata = await request.json()
+      setMetadata(metadata[url])
+    }
 
-    fetchMetadata();
-  }, [url]);
+    fetchMetadata()
+  }, [url])
 
   if (!metadata) {
-    return null;
+    return null
   }
 
   return (
@@ -49,7 +49,7 @@ const OpenGraphImage = ({ url }: { url: string }) => {
         </CardHeader>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default OpenGraphImage;
+export default OpenGraphImage

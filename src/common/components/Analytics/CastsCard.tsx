@@ -1,19 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import React from 'react';
-import AnalyticsGraph from './AnalyticsGraph';
-import { CombinedActivityData } from '@/common/types/types';
-import { Interval } from '@/common/helpers/search';
-import { formatLargeNumber } from '@/common/helpers/text';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import React from 'react'
+import AnalyticsGraph from './AnalyticsGraph'
+import { CombinedActivityData } from '@/common/types/types'
+import { Interval } from '@/common/helpers/search'
+import { formatLargeNumber } from '@/common/helpers/text'
 
 type StatsWithGraphCard = {
-  interval: Interval;
-  data: CombinedActivityData;
-  isLoading: boolean;
-};
+  interval: Interval
+  data: CombinedActivityData
+  isLoading: boolean
+}
 
 const CastsCard = ({ interval, data, isLoading }: StatsWithGraphCard) => {
-  const { overview, aggregated = [] } = data;
-  const value = (overview && overview[interval === Interval.d7 ? 'd7' : 'd30']) || 0;
+  const { overview, aggregated = [] } = data
+  const value = (overview && overview[interval === Interval.d7 ? 'd7' : 'd30']) || 0
 
   return (
     <Card className="h-fit">
@@ -37,7 +37,7 @@ const CastsCard = ({ interval, data, isLoading }: StatsWithGraphCard) => {
         )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default CastsCard;
+export default CastsCard

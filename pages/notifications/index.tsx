@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { castTextStyle } from '@/common/helpers/css';
-import { useAccountStore } from '../../src/stores/useAccountStore';
-import { SelectableListWithHotkeys } from '../../src/common/components/SelectableListWithHotkeys';
-import isEmpty from 'lodash.isempty';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { Key } from 'ts-key-enum';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
+import { castTextStyle } from '@/common/helpers/css'
+import { useAccountStore } from '../../src/stores/useAccountStore'
+import { SelectableListWithHotkeys } from '../../src/common/components/SelectableListWithHotkeys'
+import isEmpty from 'lodash.isempty'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { Key } from 'ts-key-enum'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
 import {
   CastWithInteractions,
   Notification,
   NotificationTypeEnum,
   ReactionWithUserInfo,
-} from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { useDataStore } from '@/stores/useDataStore';
-import { Loading } from '@/common/components/Loading';
-import { CastModalView, useNavigationStore } from '@/stores/useNavigationStore';
-import orderBy from 'lodash.orderby';
-import { Button } from '@/components/ui/button';
+} from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import { useDataStore } from '@/stores/useDataStore'
+import { Loading } from '@/common/components/Loading'
+import { CastModalView, useNavigationStore } from '@/stores/useNavigationStore'
+import orderBy from 'lodash.orderby'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,17 +25,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useIsMobile, useIsMounted } from '@/common/helpers/hooks';
+} from '@/components/ui/dropdown-menu'
+import { useIsMobile, useIsMounted } from '@/common/helpers/hooks'
 
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CastRow } from '@/common/components/CastRow';
-import SkeletonCastRow from '@/common/components/SkeletonCastRow';
-import ProfileInfo from '@/common/components/Sidebar/ProfileInfo';
-import { cn } from '@/lib/utils';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CastRow } from '@/common/components/CastRow'
+import SkeletonCastRow from '@/common/components/SkeletonCastRow'
+import ProfileInfo from '@/common/components/Sidebar/ProfileInfo'
+import { cn } from '@/lib/utils'
+import { formatDistanceToNowStrict } from 'date-fns'
 
-const DEFAULT_SHOW_REACTIONS_LIMIT = 15;
+const DEFAULT_SHOW_REACTIONS_LIMIT = 15
 
 enum NotificationTab {
   all = 'all',
@@ -49,213 +49,213 @@ enum NotificationTab {
 const notificationTabToType = (tab: NotificationTab) => {
   switch (tab) {
     case NotificationTab.mentions:
-      return NotificationTypeEnum.Mention;
+      return NotificationTypeEnum.Mention
     case NotificationTab.likes:
-      return NotificationTypeEnum.Likes;
+      return NotificationTypeEnum.Likes
     case NotificationTab.follows:
-      return NotificationTypeEnum.Follows;
+      return NotificationTypeEnum.Follows
     case NotificationTab.replies:
-      return NotificationTypeEnum.Reply;
+      return NotificationTypeEnum.Reply
     case NotificationTab.recasts:
-      return NotificationTypeEnum.Recasts;
+      return NotificationTypeEnum.Recasts
     case NotificationTab.all:
     default:
-      return undefined;
+      return undefined
   }
-};
+}
 
 const filterNotificationsByActiveTab = (notifications: Notification[], selectedTab: NotificationTab) => {
-  const notificationType = notificationTabToType(selectedTab);
-  if (!notificationType) return notifications;
+  const notificationType = notificationTabToType(selectedTab)
+  if (!notificationType) return notifications
 
-  return notifications.filter((notification) => notification.type === notificationType);
-};
+  return notifications.filter((notification) => notification.type === notificationType)
+}
 
 const renderTabsTrigger = (value: NotificationTab, label: string) => (
   <TabsTrigger className="w-full" value={value}>
     {label}
   </TabsTrigger>
-);
+)
 
 const Notifications = () => {
-  const { isNewCastModalOpen, setCastModalView, openNewCastModal, closeNewCastModal } = useNavigationStore();
+  const { isNewCastModalOpen, setCastModalView, openNewCastModal, closeNewCastModal } = useNavigationStore()
 
-  const selectedAccount = useAccountStore((state) => state.accounts[state.selectedAccountIdx]);
-  const isMobile = useIsMobile();
-  const [allNotifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedNotificationIdx, setSelectedNotificationIdx] = useState<number>(0);
-  const [isLeftColumnSelected, setIsLeftColumnSelected] = useState<boolean>(true);
-  const [parentCastHash, setParentCastHash] = useState<string>();
-  const [parentCast, setParentCast] = useState<CastWithInteractions>();
-  const { selectedCast, updateSelectedCast } = useDataStore();
-  const [loadMoreCursor, setLoadMoreCursor] = useState<string>();
-  const [activeTab, setActiveTab] = useState<NotificationTab>(NotificationTab.all);
-  const [showReactionsLimit, setShowReactionsLimit] = useState<number>(DEFAULT_SHOW_REACTIONS_LIMIT);
-  const viewerFid = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.platformAccountId);
-  const notifications = filterNotificationsByActiveTab(allNotifications, activeTab);
-  console.log('notifications', notifications);
+  const selectedAccount = useAccountStore((state) => state.accounts[state.selectedAccountIdx])
+  const isMobile = useIsMobile()
+  const [allNotifications, setNotifications] = useState<Notification[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [selectedNotificationIdx, setSelectedNotificationIdx] = useState<number>(0)
+  const [isLeftColumnSelected, setIsLeftColumnSelected] = useState<boolean>(true)
+  const [parentCastHash, setParentCastHash] = useState<string>()
+  const [parentCast, setParentCast] = useState<CastWithInteractions>()
+  const { selectedCast, updateSelectedCast } = useDataStore()
+  const [loadMoreCursor, setLoadMoreCursor] = useState<string>()
+  const [activeTab, setActiveTab] = useState<NotificationTab>(NotificationTab.all)
+  const [showReactionsLimit, setShowReactionsLimit] = useState<number>(DEFAULT_SHOW_REACTIONS_LIMIT)
+  const viewerFid = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.platformAccountId)
+  const notifications = filterNotificationsByActiveTab(allNotifications, activeTab)
+  console.log('notifications', notifications)
 
   useEffect(() => {
     // if navigating away, reset the selected cast
     return () => {
-      updateSelectedCast();
-    };
-  }, []);
+      updateSelectedCast()
+    }
+  }, [])
 
   const loadData = async ({ reset }: { reset?: boolean }) => {
-    if (!viewerFid) return;
-    console.log('Notifications Page -> loadData | loadMoreCursor', loadMoreCursor);
-    setIsLoading(true);
+    if (!viewerFid) return
+    console.log('Notifications Page -> loadData | loadMoreCursor', loadMoreCursor)
+    setIsLoading(true)
     if (reset) {
-      setNotifications([]);
+      setNotifications([])
     }
-    const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+    const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
 
     const options = reset
       ? {}
       : {
           cursor: loadMoreCursor,
-        };
-    const resp = await neynarClient.fetchAllNotifications(Number(viewerFid), options);
+        }
+    const resp = await neynarClient.fetchAllNotifications(Number(viewerFid), options)
     if (resp.notifications) {
       if (reset) {
-        setNotifications(resp.notifications);
+        setNotifications(resp.notifications)
       } else {
-        setNotifications([...allNotifications, ...resp.notifications]);
+        setNotifications([...allNotifications, ...resp.notifications])
       }
-      setLoadMoreCursor(resp.next.cursor);
+      setLoadMoreCursor(resp.next.cursor)
     }
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   useEffect(() => {
-    if (!viewerFid) return;
+    if (!viewerFid) return
 
-    setLoadMoreCursor(undefined);
-    loadData({ reset: true });
+    setLoadMoreCursor(undefined)
+    loadData({ reset: true })
 
-    closeNewCastModal();
-    setIsLeftColumnSelected(true);
-    setSelectedNotificationIdx(0);
-  }, [viewerFid]);
+    closeNewCastModal()
+    setIsLeftColumnSelected(true)
+    setSelectedNotificationIdx(0)
+  }, [viewerFid])
 
   useEffect(() => {
-    setSelectedNotificationIdx(0);
-  }, [activeTab]);
+    setSelectedNotificationIdx(0)
+  }, [activeTab])
 
   useEffect(() => {
     if (parentCastHash) {
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
       neynarClient
         .fetchBulkCasts([parentCastHash], { viewerFid: Number(viewerFid) })
         .then((resp) => {
-          setParentCast(resp.result.casts[0]);
+          setParentCast(resp.result.casts[0])
         })
         .catch((err) => {
-          console.error(`Error fetching parent cast: ${err}`);
-        });
+          console.error(`Error fetching parent cast: ${err}`)
+        })
     }
-  }, [parentCastHash]);
+  }, [parentCastHash])
 
   const onReply = () => {
-    setCastModalView(CastModalView.Reply);
-    openNewCastModal();
-  };
+    setCastModalView(CastModalView.Reply)
+    openNewCastModal()
+  }
 
   const onQuote = () => {
-    setCastModalView(CastModalView.Quote);
-    openNewCastModal();
-  };
+    setCastModalView(CastModalView.Quote)
+    openNewCastModal()
+  }
 
   useHotkeys('r', onReply, [openNewCastModal], {
     enabled: !isNewCastModalOpen,
     enableOnFormTags: false,
     preventDefault: true,
-  });
+  })
 
   useHotkeys('q', onQuote, [openNewCastModal], {
     enabled: !isNewCastModalOpen,
     enableOnFormTags: false,
     preventDefault: true,
-  });
+  })
 
   useHotkeys(
     ['tab', 'shift+tab'],
     () => {
-      setIsLeftColumnSelected(!isLeftColumnSelected);
+      setIsLeftColumnSelected(!isLeftColumnSelected)
     },
     [isLeftColumnSelected],
     {
       enabled: !isNewCastModalOpen,
       preventDefault: true,
     }
-  );
+  )
 
-  useHotkeys('shift+1', () => setActiveTab(NotificationTab.all), [], {});
-  useHotkeys('shift+2', () => setActiveTab(NotificationTab.replies), [], {});
-  useHotkeys('shift+3', () => setActiveTab(NotificationTab.mentions), [], {});
-  useHotkeys('shift+4', () => setActiveTab(NotificationTab.likes), [], {});
-  useHotkeys('shift+5', () => setActiveTab(NotificationTab.recasts), [], {});
-  useHotkeys('shift+6', () => setActiveTab(NotificationTab.follows), [], {});
+  useHotkeys('shift+1', () => setActiveTab(NotificationTab.all), [], {})
+  useHotkeys('shift+2', () => setActiveTab(NotificationTab.replies), [], {})
+  useHotkeys('shift+3', () => setActiveTab(NotificationTab.mentions), [], {})
+  useHotkeys('shift+4', () => setActiveTab(NotificationTab.likes), [], {})
+  useHotkeys('shift+5', () => setActiveTab(NotificationTab.recasts), [], {})
+  useHotkeys('shift+6', () => setActiveTab(NotificationTab.follows), [], {})
 
   useHotkeys(
     ['l', 'o', Key.Enter, Key.ArrowRight],
     () => {
-      setIsLeftColumnSelected(false);
+      setIsLeftColumnSelected(false)
     },
     [isLeftColumnSelected],
     {
       enabled: !isNewCastModalOpen,
       preventDefault: true,
     }
-  );
+  )
 
   useHotkeys(
     ['h', Key.Escape, Key.ArrowLeft],
     () => {
-      setIsLeftColumnSelected(true);
+      setIsLeftColumnSelected(true)
     },
     [isLeftColumnSelected],
     {
       enabled: !isNewCastModalOpen,
       preventDefault: true,
     }
-  );
+  )
 
   const getActionDescriptionForRow = (notification: Notification): string => {
-    const cast = notification.cast;
+    const cast = notification.cast
     switch (notification.type) {
       case NotificationTypeEnum.Reply:
-        return cast ? `@${cast.author.username} replied` : 'Someone replied';
+        return cast ? `@${cast.author.username} replied` : 'Someone replied'
       case NotificationTypeEnum.Mention:
-        return cast ? `@${cast.author.username} mentioned you` : 'Someone mentioned you';
+        return cast ? `@${cast.author.username} mentioned you` : 'Someone mentioned you'
       case NotificationTypeEnum.Likes:
-        return `Received ${notification.reactions?.length} likes`;
+        return `Received ${notification.reactions?.length} likes`
       case NotificationTypeEnum.Follows:
-        return `${notification.follows?.length} new followers`;
+        return `${notification.follows?.length} new followers`
       case NotificationTypeEnum.Recasts:
-        return `Received ${notification.reactions?.length} recasts`;
+        return `Received ${notification.reactions?.length} recasts`
       default:
-        return '';
+        return ''
     }
-  };
+  }
 
   const renderNotificationRow = (notification: Notification, idx: number) => {
-    const { cast } = notification;
+    const { cast } = notification
 
-    const timeAgoStr = formatDistanceToNowStrict(new Date(notification.most_recent_timestamp));
-    const actionDescription = getActionDescriptionForRow(notification);
-    const author = notification.type !== NotificationTypeEnum.Follows ? cast?.author : selectedAccount.user;
+    const timeAgoStr = formatDistanceToNowStrict(new Date(notification.most_recent_timestamp))
+    const actionDescription = getActionDescriptionForRow(notification)
+    const author = notification.type !== NotificationTypeEnum.Follows ? cast?.author : selectedAccount.user
 
     return (
       <li
         key={`item-${notification.most_recent_timestamp}`}
         onClick={() => {
-          setSelectedNotificationIdx(idx);
-          scrollTo(0, 0);
+          setSelectedNotificationIdx(idx)
+          scrollTo(0, 0)
           if (isMobile) {
-            setIsLeftColumnSelected(false);
+            setIsLeftColumnSelected(false)
           }
         }}
         className={cn(
@@ -282,8 +282,8 @@ const Notifications = () => {
           )}
         </div>
       </li>
-    );
-  };
+    )
+  }
 
   const renderLoadNotificationsButton = () => (
     <div className="flex justify-center my-8">
@@ -291,7 +291,7 @@ const Notifications = () => {
         {isLoading ? <Loading /> : `Load ${notifications.length === 0 ? '' : 'more'}`}
       </Button>
     </div>
-  );
+  )
 
   const renderShowMoreReactionsButton = () => (
     <div className="flex justify-center my-8">
@@ -304,7 +304,7 @@ const Notifications = () => {
         Show More
       </Button>
     </div>
-  );
+  )
 
   const renderLeftColumn = () => {
     return (
@@ -326,15 +326,15 @@ const Notifications = () => {
           <div>{renderLoadNotificationsButton()}</div>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderProfilesFromReactions = (reactions?: ReactionWithUserInfo[]) => {
-    if (!reactions) return null;
+    if (!reactions) return null
 
     const reactionFids = orderBy(reactions, ['user.follower_count'], ['desc'])
       .slice(0, showReactionsLimit)
-      .map((reaction) => reaction.user.fid);
+      .map((reaction) => reaction.user.fid)
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 items-center">
         {reactionFids &&
@@ -345,18 +345,18 @@ const Notifications = () => {
           ))}
         {reactions.length > showReactionsLimit && renderShowMoreReactionsButton()}
       </div>
-    );
-  };
+    )
+  }
 
   const renderMainContent = () => {
-    const notification = notifications[selectedNotificationIdx];
+    const notification = notifications[selectedNotificationIdx]
     if (isEmpty(notification) && !isLoading && isEmpty(notifications))
       return (
         <div className="text-foreground flex-1 flex items-center justify-center">{renderLoadNotificationsButton()}</div>
-      );
+      )
 
-    if (!notification) return null;
-    const notificationType = notification.type;
+    if (!notification) return null
+    const notificationType = notification.type
 
     return (
       <div
@@ -383,26 +383,26 @@ const Notifications = () => {
           )}
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   useEffect(() => {
     if (!isEmpty(notifications) && selectedNotificationIdx > -1) {
-      const notification = notifications[selectedNotificationIdx];
+      const notification = notifications[selectedNotificationIdx]
 
-      if (!notification) return;
+      if (!notification) return
 
       if (notification.type === NotificationTypeEnum.Reply || notification.type === NotificationTypeEnum.Mention) {
-        const hash = notification?.cast?.parent_hash;
+        const hash = notification?.cast?.parent_hash
         if (hash) {
-          setParentCastHash(hash);
+          setParentCastHash(hash)
         }
       } else {
-        setParentCastHash(undefined);
+        setParentCastHash(undefined)
       }
-      updateSelectedCast(notification.cast);
+      updateSelectedCast(notification.cast)
     }
-  }, [notifications, selectedNotificationIdx, isLoading]);
+  }, [notifications, selectedNotificationIdx, isLoading])
 
   const renderNotificationFilterDropdown = () => (
     <DropdownMenu>
@@ -418,7 +418,7 @@ const Notifications = () => {
         <DropdownMenuCheckboxItem>All</DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 
   const renderGoBack = () => (
     <div className="border-b p-4 md:hidden">
@@ -426,7 +426,7 @@ const Notifications = () => {
         Go back
       </Button>
     </div>
-  );
+  )
 
   return (
     <div className="flex md:min-h-screen min-w-full flex-col bg-muted/40">
@@ -461,7 +461,7 @@ const Notifications = () => {
         </main>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Notifications;
+export default Notifications

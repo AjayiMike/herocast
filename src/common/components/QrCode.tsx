@@ -1,7 +1,7 @@
-import React from 'react';
-import QRCode from 'react-qr-code';
-import ClickToCopyText from '@/common/components/ClickToCopyText';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
+import React from 'react'
+import QRCode from 'react-qr-code'
+import ClickToCopyText from '@/common/components/ClickToCopyText'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid'
 
 export const QrCode = ({ deepLink }: { deepLink: string }) => {
   return (
@@ -19,5 +19,5 @@ export const QrCode = ({ deepLink }: { deepLink: string }) => {
         </span>
       </div>
     </>
-  );
-};
+  )
+}

@@ -1,33 +1,33 @@
-import React, { useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AnalyticsData } from '@/common/types/types';
-import { format, subDays } from 'date-fns';
-import { Interval } from '@/common/helpers/search';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
-import { roundToNextDigit } from '@/common/helpers/math';
+import React, { useMemo } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AnalyticsData } from '@/common/types/types'
+import { format, subDays } from 'date-fns'
+import { Interval } from '@/common/helpers/search'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { roundToNextDigit } from '@/common/helpers/math'
 
 type DynamicChartCardProps = {
-  interval: Interval;
-  analyticsData: AnalyticsData;
-  isLoading: boolean;
-};
+  interval: Interval
+  analyticsData: AnalyticsData
+  isLoading: boolean
+}
 
 function DataPickerDropdown({ values, defaultValue, updateValue }) {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<Interval | undefined>(defaultValue);
+  const [open, setOpen] = React.useState(false)
+  const [value, setValue] = React.useState<Interval | undefined>(defaultValue)
 
-  const canSelect = updateValue !== undefined;
+  const canSelect = updateValue !== undefined
   const handleSelect = (currentValue: Interval) => {
-    setValue(currentValue === value ? undefined : currentValue);
-    updateValue?.(currentValue);
-    setOpen(false);
-  };
+    setValue(currentValue === value ? undefined : currentValue)
+    updateValue?.(currentValue)
+    setOpen(false)
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -63,73 +63,73 @@ function DataPickerDropdown({ values, defaultValue, updateValue }) {
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }
 
-const values = ['casts', 'follows', 'reactions'];
+const values = ['casts', 'follows', 'reactions']
 
 const normalizeTimestampToDate = (timestamp: string) => {
-  return new Date(timestamp).toISOString().split('T')[0];
-};
+  return new Date(timestamp).toISOString().split('T')[0]
+}
 
 const getAggregatedDataForKey = (analyticsData: AnalyticsData, dataKey: string, startDate: Date) => {
-  const activityData = analyticsData[dataKey];
-  if (!activityData || !activityData?.aggregated) return [];
+  const activityData = analyticsData[dataKey]
+  if (!activityData || !activityData?.aggregated) return []
 
   const res = activityData.aggregated.map((item) => ({
     date: normalizeTimestampToDate(item.timestamp),
     [dataKey]: item.count,
-  }));
-  return res.filter((item) => new Date(item.date) >= startDate);
-};
+  }))
+  return res.filter((item) => new Date(item.date) >= startDate)
+}
 
 const mergeData = (data1, data2, startDate: Date, dataKeys: string[]) => {
-  const dataMap = new Map();
+  const dataMap = new Map()
   data1.forEach((item) => {
-    dataMap.set(item.date, { ...dataMap.get(item.date), ...item });
-  });
+    dataMap.set(item.date, { ...dataMap.get(item.date), ...item })
+  })
   data2.forEach((item) => {
-    dataMap.set(item.date, { ...dataMap.get(item.date), ...item });
-  });
+    dataMap.set(item.date, { ...dataMap.get(item.date), ...item })
+  })
 
-  const result = [];
-  const currentDate = startDate;
-  const today = new Date();
+  const result = []
+  const currentDate = startDate
+  const today = new Date()
   while (currentDate <= today) {
-    const dateString = normalizeTimestampToDate(currentDate.toISOString());
-    const existingEntry = dataMap.get(dateString) || {};
+    const dateString = normalizeTimestampToDate(currentDate.toISOString())
+    const existingEntry = dataMap.get(dateString) || {}
     const newEntry = {
       date: dateString,
       [dataKeys[0]]: existingEntry[dataKeys[0]] || 0,
       [dataKeys[1]]: existingEntry[dataKeys[1]] || 0,
-    };
-    dataMap.set(dateString, newEntry);
-    result.push(newEntry);
-    currentDate.setDate(currentDate.getDate() + 1);
+    }
+    dataMap.set(dateString, newEntry)
+    result.push(newEntry)
+    currentDate.setDate(currentDate.getDate() + 1)
   }
 
-  return result;
-};
+  return result
+}
 
 const DynamicChartCard = ({ interval, analyticsData, isLoading }: DynamicChartCardProps) => {
-  const [dataKey1, setDataKey1] = React.useState(values[0]);
-  const [dataKey2, setDataKey2] = React.useState(values[1]);
+  const [dataKey1, setDataKey1] = React.useState(values[0])
+  const [dataKey2, setDataKey2] = React.useState(values[1])
   const chartConfig = React.useMemo(
     () => Object.fromEntries(values.map((value) => [value, { label: value }])),
     [values]
-  );
+  )
 
   const data = useMemo(() => {
-    if (!analyticsData) return [];
+    if (!analyticsData) return []
 
-    const startDate = subDays(new Date(), interval === Interval.d7 ? 7 : 30);
+    const startDate = subDays(new Date(), interval === Interval.d7 ? 7 : 30)
 
-    const data1 = getAggregatedDataForKey(analyticsData, dataKey1, startDate);
-    const data2 = getAggregatedDataForKey(analyticsData, dataKey2, startDate);
-    if (!data1 || !data2) return [];
+    const data1 = getAggregatedDataForKey(analyticsData, dataKey1, startDate)
+    const data2 = getAggregatedDataForKey(analyticsData, dataKey2, startDate)
+    if (!data1 || !data2) return []
 
-    return mergeData(data1, data2, startDate, [dataKey1, dataKey2]);
-  }, [analyticsData, interval, dataKey1, dataKey2]);
+    return mergeData(data1, data2, startDate, [dataKey1, dataKey2])
+  }, [analyticsData, interval, dataKey1, dataKey2])
 
   return (
     <Card className="h-fit">
@@ -183,7 +183,7 @@ const DynamicChartCard = ({ interval, analyticsData, isLoading }: DynamicChartCa
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
-                        });
+                        })
                       }}
                     />
                   }
@@ -214,7 +214,7 @@ const DynamicChartCard = ({ interval, analyticsData, isLoading }: DynamicChartCa
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default DynamicChartCard;
+export default DynamicChartCard

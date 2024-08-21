@@ -1,54 +1,54 @@
-import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { useAccountStore } from '@/stores/useAccountStore';
-import { ChannelType } from '../constants/channels';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loading } from './Loading';
-import { Button } from '@/components/ui/button';
-import { formatLargeNumber } from '../helpers/text';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { useAccountStore } from '@/stores/useAccountStore'
+import { ChannelType } from '../constants/channels'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Loading } from './Loading'
+import { Button } from '@/components/ui/button'
+import { formatLargeNumber } from '../helpers/text'
 
 type ProfileHoverCardProps = {
-  channelName: string;
-  children: React.ReactNode;
-  className?: string;
-};
+  channelName: string
+  children: React.ReactNode
+  className?: string
+}
 
 const ChannelHoverCard = memo(({ channelName, children, className }: ProfileHoverCardProps) => {
-  const accountChannels = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels || []);
-  const { addPinnedChannel, removePinnedChannel, allChannels, setSelectedChannelUrl } = useAccountStore();
-  const [channel, setChannel] = useState<ChannelType | undefined>();
+  const accountChannels = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels || [])
+  const { addPinnedChannel, removePinnedChannel, allChannels, setSelectedChannelUrl } = useAccountStore()
+  const [channel, setChannel] = useState<ChannelType | undefined>()
 
   const foundChannel = useMemo(() => {
-    const findableName = channelName.replace(/[-\s]\//g, '').toLowerCase();
-    return allChannels.find((c) => c.name.toLowerCase() === findableName);
-  }, [channelName, allChannels]);
+    const findableName = channelName.replace(/[-\s]\//g, '').toLowerCase()
+    return allChannels.find((c) => c.name.toLowerCase() === findableName)
+  }, [channelName, allChannels])
 
   useEffect(() => {
-    if (!foundChannel || foundChannel === channel) return;
-    setChannel(foundChannel);
-  }, [foundChannel, channel]);
+    if (!foundChannel || foundChannel === channel) return
+    setChannel(foundChannel)
+  }, [foundChannel, channel])
 
   const isChannelPinned = useMemo(
     () => channel && accountChannels.findIndex((c) => c.url === channel.url) !== -1,
     [channel, accountChannels]
-  );
+  )
 
   const onClick = useCallback(() => {
-    if (!channel) return;
-    setSelectedChannelUrl(channel?.url);
-  }, [channel, setSelectedChannelUrl]);
+    if (!channel) return
+    setSelectedChannelUrl(channel?.url)
+  }, [channel, setSelectedChannelUrl])
 
   const onClickTogglePin = useCallback(() => {
-    if (!channel) return;
+    if (!channel) return
     if (isChannelPinned) {
-      removePinnedChannel(channel);
+      removePinnedChannel(channel)
     } else {
-      addPinnedChannel(channel);
+      addPinnedChannel(channel)
     }
-  }, [channel, isChannelPinned, removePinnedChannel, addPinnedChannel]);
+  }, [channel, isChannelPinned, removePinnedChannel, addPinnedChannel])
 
   const renderChannelContent = useMemo(() => {
-    if (!channel) return <Loading />;
+    if (!channel) return <Loading />
 
     return (
       <div className="space-y-2">
@@ -81,10 +81,10 @@ const ChannelHoverCard = memo(({ channelName, children, className }: ProfileHove
           <p className="flex pt-2 pr-2 text-sm break-words overflow-x-hidden">{channel.description}</p>
         )}
       </div>
-    );
-  }, [channel, isChannelPinned, onClick, onClickTogglePin]);
+    )
+  }, [channel, isChannelPinned, onClick, onClickTogglePin])
 
-  if (!channel) return children;
+  if (!channel) return children
 
   return (
     <HoverCard openDelay={200}>
@@ -95,9 +95,9 @@ const ChannelHoverCard = memo(({ channelName, children, className }: ProfileHove
         {renderChannelContent}
       </HoverCardContent>
     </HoverCard>
-  );
-});
+  )
+})
 
-ChannelHoverCard.displayName = 'ChannelHoverCard';
+ChannelHoverCard.displayName = 'ChannelHoverCard'
 
-export default ChannelHoverCard;
+export default ChannelHoverCard

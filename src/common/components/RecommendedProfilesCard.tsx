@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import FollowButton from './FollowButton';
-import { useDataStore } from '@/stores/useDataStore';
+import React, { useEffect, useState } from 'react'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import FollowButton from './FollowButton'
+import { useDataStore } from '@/stores/useDataStore'
 
 const defaultProfiles: User[] = [
   {
@@ -28,36 +28,36 @@ const defaultProfiles: User[] = [
       },
     },
   },
-] as User[];
+] as User[]
 
 const RecommendedProfilesCard = () => {
-  const [profiles, setProfiles] = useState<User[]>(defaultProfiles);
+  const [profiles, setProfiles] = useState<User[]>(defaultProfiles)
 
-  const { addUserProfile } = useDataStore();
+  const { addUserProfile } = useDataStore()
 
   useEffect(() => {
     const getProfiles = async () => {
-      const client = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+      const client = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
 
       const relevantFollowers = await client.fetchActiveUsers({
         limit: 14,
-      });
+      })
 
       if (!relevantFollowers || !relevantFollowers.users) {
-        return;
+        return
       }
 
-      setProfiles([...defaultProfiles, ...relevantFollowers.users]);
-    };
+      setProfiles([...defaultProfiles, ...relevantFollowers.users])
+    }
 
-    getProfiles();
-  }, []);
+    getProfiles()
+  }, [])
 
   useEffect(() => {
     profiles.forEach((user) => {
-      addUserProfile({ user });
-    });
-  }, [profiles]);
+      addUserProfile({ user })
+    })
+  }, [profiles])
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-8">
@@ -87,7 +87,7 @@ const RecommendedProfilesCard = () => {
         ))}
       </ul>
     </div>
-  );
-};
+  )
+}
 
-export default RecommendedProfilesCard;
+export default RecommendedProfilesCard
