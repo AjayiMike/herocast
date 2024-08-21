@@ -38,10 +38,8 @@ export const SelectableListWithHotkeys = ({
   // scroll to selected cast when selectedCastIdx changes
   useEffect(() => {
     if (!disableScroll && scollToRef.current) {
-      ;(scollToRef.current as HTMLElement).scrollIntoView({
-        behavior: 'auto',
-        block: 'start',
-      })
+      // eslint-disable-next-line no-extra-semi
+      ;(scollToRef.current as HTMLElement).scrollIntoView({ behavior: 'auto', block: 'start' })
     }
   }, [selectedIdx])
 
