@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   swcMinify: false,
@@ -36,7 +36,7 @@ const nextConfig = {
         destination: '/login',
         permanent: false,
       },
-    ];
+    ]
   },
   async headers() {
     return [
@@ -58,9 +58,9 @@ const nextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
-};
+}
 
 export default withSentryConfig(
   nextConfig,
@@ -101,4 +101,4 @@ export default withSentryConfig(
     // https://vercel.com/docs/cron-jobs
     automaticVercelMonitors: true,
   }
-);
+)

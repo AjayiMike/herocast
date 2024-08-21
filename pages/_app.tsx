@@ -1,21 +1,21 @@
-import '../src/globals.css';
-import '@rainbow-me/rainbowkit/styles.css';
+import '../src/globals.css'
+import '@rainbow-me/rainbowkit/styles.css'
 
-import React, { useState, useEffect } from 'react';
-import type { AppProps } from 'next/app';
-import { ThemeProvider } from '../src/common/hooks/ThemeProvider';
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider } from 'wagmi';
-import { rainbowKitTheme, config } from '../src/common/helpers/rainbowkit';
-import { PostHogProvider } from 'posthog-js/react';
-import { loadPosthogAnalytics } from '../src/lib/analytics';
-import { useRouter } from 'next/router';
-import localFont from 'next/font/local';
-import CommandPalette from '../src/common/components/CommandPalette';
-import Home from '../src/home';
-import { AuthProvider } from '@/common/context/AuthContext';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from 'react'
+import type { AppProps } from 'next/app'
+import { ThemeProvider } from '../src/common/hooks/ThemeProvider'
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { WagmiProvider } from 'wagmi'
+import { rainbowKitTheme, config } from '../src/common/helpers/rainbowkit'
+import { PostHogProvider } from 'posthog-js/react'
+import { loadPosthogAnalytics } from '../src/lib/analytics'
+import { useRouter } from 'next/router'
+import localFont from 'next/font/local'
+import CommandPalette from '../src/common/components/CommandPalette'
+import Home from '../src/home'
+import { AuthProvider } from '@/common/context/AuthContext'
+import { cn } from '@/lib/utils'
 
 const satoshi = localFont({
   src: [
@@ -50,21 +50,21 @@ const satoshi = localFont({
       style: 'normal',
     },
   ],
-});
+})
 
-const posthog = loadPosthogAnalytics();
+const posthog = loadPosthogAnalytics()
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  const [queryClient] = useState(() => new QueryClient());
+  const router = useRouter()
+  const [queryClient] = useState(() => new QueryClient())
   useEffect(() => {
-    const handleRouteChange = () => posthog?.capture('$pageview');
-    router.events.on('routeChangeComplete', handleRouteChange);
+    const handleRouteChange = () => posthog?.capture('$pageview')
+    router.events.on('routeChangeComplete', handleRouteChange)
 
     return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-    };
-  }, []);
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [])
 
   const children = (
     <main
@@ -90,11 +90,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         </WagmiProvider>
       </PostHogProvider>
     </main>
-  );
+  )
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       {children}
     </ThemeProvider>
-  );
+  )
 }

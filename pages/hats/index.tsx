@@ -1,25 +1,25 @@
-import React, { ReactNode, useState } from 'react';
-import { Separator } from '@/components/ui/separator';
-import StepSequence from '@/common/components/Steps/StepSequence';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAccount } from 'wagmi';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import TransferAccountToHatsDelegator from '@/common/components/HatsProtocol/TransferAccountToHatsDelegator';
-import CreateHatsTreeForm from '@/common/components/HatsProtocol/CreateHatsTreeForm';
-import { NeynarAPIClient, convertToV2User } from '@neynar/nodejs-sdk';
-import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import BigOptionSelector from '@/common/components/BigOptionSelector';
-import isEmpty from 'lodash.isempty';
-import SwitchWalletButton from '@/common/components/SwitchWalletButton';
-import { Loading } from '@/common/components/Loading';
-import ClickToCopyText from '@/common/components/ClickToCopyText';
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import React, { ReactNode, useState } from 'react'
+import { Separator } from '@/components/ui/separator'
+import StepSequence from '@/common/components/Steps/StepSequence'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAccount } from 'wagmi'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import TransferAccountToHatsDelegator from '@/common/components/HatsProtocol/TransferAccountToHatsDelegator'
+import CreateHatsTreeForm from '@/common/components/HatsProtocol/CreateHatsTreeForm'
+import { NeynarAPIClient, convertToV2User } from '@neynar/nodejs-sdk'
+import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import BigOptionSelector from '@/common/components/BigOptionSelector'
+import isEmpty from 'lodash.isempty'
+import SwitchWalletButton from '@/common/components/SwitchWalletButton'
+import { Loading } from '@/common/components/Loading'
+import ClickToCopyText from '@/common/components/ClickToCopyText'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import SharedAccountOwnershipSetup, {
   OwnershipSetupSteps,
-} from '@/common/components/HatsProtocol/SharedAccountOwnershipSetup';
-import { useHotkeys } from 'react-hotkeys-hook';
+} from '@/common/components/HatsProtocol/SharedAccountOwnershipSetup'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 enum HatsSignupNav {
   select_account = 'SELECT_ACCOUNT',
@@ -56,77 +56,77 @@ const hatsSignupSteps = [
     idx: 4,
     keys: [HatsSignupNav.invite],
   },
-];
+]
 
-const APP_FID = process.env.NEXT_PUBLIC_APP_FID!;
+const APP_FID = process.env.NEXT_PUBLIC_APP_FID!
 
 export default function HatsProtocolPage() {
-  const [step, setStep] = useState<HatsSignupNav>(HatsSignupNav.select_account);
-  const [accountToTransfer, setAccountToTransfer] = useState<User>();
-  const [delegatorContractAddress, setDelegatorContractAddress] = useState<`0x${string}` | null>();
-  const [adminHatId, setAdminHatId] = useState<bigint>();
-  const [casterHatId, setCasterHatId] = useState<bigint>();
+  const [step, setStep] = useState<HatsSignupNav>(HatsSignupNav.select_account)
+  const [accountToTransfer, setAccountToTransfer] = useState<User>()
+  const [delegatorContractAddress, setDelegatorContractAddress] = useState<`0x${string}` | null>()
+  const [adminHatId, setAdminHatId] = useState<bigint>()
+  const [casterHatId, setCasterHatId] = useState<bigint>()
   const [sharedAccountOwnershipDefaultStep, setSharedAccountOwnershipDefaultStep] = useState<OwnershipSetupSteps>(
     OwnershipSetupSteps.unknown
-  );
-  const [infoMessage, setInfoMessage] = useState<string | null>();
-  const { address, isConnected } = useAccount();
-  const [userInput, setUserInput] = useState<string>('');
-  const [isLoadingAccount, setIsLoadingAccount] = useState(false);
+  )
+  const [infoMessage, setInfoMessage] = useState<string | null>()
+  const { address, isConnected } = useAccount()
+  const [userInput, setUserInput] = useState<string>('')
+  const [isLoadingAccount, setIsLoadingAccount] = useState(false)
   const shareWithOthersText = `Join my shared Farcaster account with delegator contract
-  address: ${delegatorContractAddress} and FID ${accountToTransfer?.fid}`;
+  address: ${delegatorContractAddress} and FID ${accountToTransfer?.fid}`
 
   const getUserByFid = async (fid: number): Promise<User | undefined> => {
-    const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
-    const viewerFid = Number(APP_FID);
+    const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
+    const viewerFid = Number(APP_FID)
     const res = await neynarClient.fetchBulkUsers([fid], {
       viewerFid,
-    });
-    return res?.users?.[0];
-  };
+    })
+    return res?.users?.[0]
+  }
 
   const fetchUser = async () => {
-    if (!userInput) return;
+    if (!userInput) return
 
-    setIsLoadingAccount(true);
+    setIsLoadingAccount(true)
     try {
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
 
-      const viewerFid = Number(APP_FID);
-      let fid: number | undefined;
-      const isNumeric = /^-?\d+$/.test(userInput);
+      const viewerFid = Number(APP_FID)
+      let fid: number | undefined
+      const isNumeric = /^-?\d+$/.test(userInput)
       if (isNumeric) {
-        fid = Number(userInput);
-        setAccountToTransfer(await getUserByFid(fid));
+        fid = Number(userInput)
+        setAccountToTransfer(await getUserByFid(fid))
       } else {
-        const userSearchTerm = userInput.replace('@', '').trim();
-        let user: User | undefined;
+        const userSearchTerm = userInput.replace('@', '').trim()
+        let user: User | undefined
         try {
-          const userByUsername = await neynarClient.lookupUserByUsername(userSearchTerm, viewerFid);
+          const userByUsername = await neynarClient.lookupUserByUsername(userSearchTerm, viewerFid)
           if (userByUsername?.result?.user) {
-            user = convertToV2User(userByUsername.result.user);
+            user = convertToV2User(userByUsername.result.user)
           }
         } catch (error) {
           /* neynar throws if lookupUserByUsername fails, but it's okay */
         }
 
         if (!user) {
-          const res = await neynarClient.searchUser(userSearchTerm, viewerFid);
-          user = res?.result?.users?.[0];
+          const res = await neynarClient.searchUser(userSearchTerm, viewerFid)
+          user = res?.result?.users?.[0]
         }
-        setAccountToTransfer(user);
+        setAccountToTransfer(user)
       }
     } catch (error) {
-      console.error(error);
-      setInfoMessage('User not found, please try again');
+      console.error(error)
+      setInfoMessage('User not found, please try again')
     } finally {
-      setIsLoadingAccount(false);
+      setIsLoadingAccount(false)
     }
-  };
+  }
 
   useHotkeys('meta+enter', fetchUser, [fetchUser], {
     enableOnFormTags: true,
-  });
+  })
 
   const getStepContent = (title: string, description: ReactNode | string, children?: ReactNode) => (
     <div className="space-y-6">
@@ -137,7 +137,7 @@ export default function HatsProtocolPage() {
       <Separator />
       {children}
     </div>
-  );
+  )
 
   const renderUserInputForm = () => (
     <div className="flex flex-col space-y-2">
@@ -148,9 +148,9 @@ export default function HatsProtocolPage() {
           placeholder="herocast"
           value={userInput}
           onChange={(e) => {
-            if (accountToTransfer) setAccountToTransfer(undefined);
-            if (infoMessage) setInfoMessage(null);
-            setUserInput(e.target.value);
+            if (accountToTransfer) setAccountToTransfer(undefined)
+            if (infoMessage) setInfoMessage(null)
+            setUserInput(e.target.value)
           }}
         />
         <Button size="lg" className="w-1/3" variant={accountToTransfer ? 'outline' : 'default'} onClick={fetchUser}>
@@ -161,7 +161,7 @@ export default function HatsProtocolPage() {
       {accountToTransfer && renderAccountToTransferPreview()}
       {isLoadingAccount && <Loading />}
     </div>
-  );
+  )
 
   const renderAccountToTransferPreview = () =>
     accountToTransfer && (
@@ -179,7 +179,7 @@ export default function HatsProtocolPage() {
           </div>
         </div>
       </div>
-    );
+    )
 
   const renderSelectAccount = () => {
     return getStepContent(
@@ -198,8 +198,8 @@ export default function HatsProtocolPage() {
           Continue
         </Button>
       </div>
-    );
-  };
+    )
+  }
 
   const renderInvite = () => {
     return (
@@ -218,13 +218,13 @@ export default function HatsProtocolPage() {
           <Label>Share this to invite other users to join your shared account</Label>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderStep = (step: string) => {
     switch (step) {
       case HatsSignupNav.select_account:
-        return renderSelectAccount();
+        return renderSelectAccount()
       case HatsSignupNav.decide_hats_protocol_setup:
         return getStepContent(
           'Onchain Permissions',
@@ -249,7 +249,7 @@ export default function HatsProtocolPage() {
               ]}
             />
           </div>
-        );
+        )
       case HatsSignupNav.create_hats_tree:
         return getStepContent(
           'Setup onchain permissions for your shared account',
@@ -260,14 +260,14 @@ export default function HatsProtocolPage() {
             {accountToTransfer && renderAccountToTransferPreview()}
             <CreateHatsTreeForm
               onSuccess={({ casterHatId, adminHatId }) => {
-                setAdminHatId(adminHatId);
-                setCasterHatId(casterHatId);
-                setSharedAccountOwnershipDefaultStep(OwnershipSetupSteps.existing_tree);
-                setStep(HatsSignupNav.account_ownership);
+                setAdminHatId(adminHatId)
+                setCasterHatId(casterHatId)
+                setSharedAccountOwnershipDefaultStep(OwnershipSetupSteps.existing_tree)
+                setStep(HatsSignupNav.account_ownership)
               }}
             />
           </div>
-        );
+        )
       case HatsSignupNav.account_ownership:
         return getStepContent(
           'Account ownership',
@@ -283,7 +283,7 @@ export default function HatsProtocolPage() {
               casterHatId={casterHatId}
             />
           </div>
-        );
+        )
       case HatsSignupNav.transfer_ownership:
         return getStepContent(
           'Transfer ownership',
@@ -296,13 +296,13 @@ export default function HatsProtocolPage() {
               toAddress={delegatorContractAddress!}
             />
           </div>
-        );
+        )
       case HatsSignupNav.invite:
-        return getStepContent('Invite others', 'Let other users join your shared account', renderInvite());
+        return getStepContent('Invite others', 'Let other users join your shared account', renderInvite())
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   return (
     <div className="w-full">
@@ -317,5 +317,5 @@ export default function HatsProtocolPage() {
         />
       </div>
     </div>
-  );
+  )
 }

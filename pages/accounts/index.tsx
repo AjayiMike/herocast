@@ -1,40 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { UserPlusIcon } from '@heroicons/react/20/solid';
-import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import React, { useEffect, useState } from 'react'
+import { UserPlusIcon } from '@heroicons/react/20/solid'
+import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
 import {
   AccountObjectType,
   PENDING_ACCOUNT_NAME_PLACEHOLDER,
   hydrateAccounts,
   useAccountStore,
-} from '@/stores/useAccountStore';
-import isEmpty from 'lodash.isempty';
-import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { QrCode } from '@/common/components/QrCode';
-import ConnectFarcasterAccountViaHatsProtocol from '@/common/components/ConnectFarcasterAccountViaHatsProtocol';
-import { useAccount } from 'wagmi';
+} from '@/stores/useAccountStore'
+import isEmpty from 'lodash.isempty'
+import { AccountPlatformType, AccountStatusType } from '@/common/constants/accounts'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { QrCode } from '@/common/components/QrCode'
+import ConnectFarcasterAccountViaHatsProtocol from '@/common/components/ConnectFarcasterAccountViaHatsProtocol'
+import { useAccount } from 'wagmi'
 import {
   WarpcastLoginStatus,
   callCreateSignerRequest,
   generateWarpcastSigner,
   getWarpcastSignerStatus,
-} from '@/common/helpers/warpcastLogin';
-import HelpCard from '@/common/components/HelpCard';
-import { useIsMounted } from '@/common/helpers/hooks';
-import { useRouter } from 'next/router';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { openWindow } from '@/common/helpers/navigation';
-import ConfirmOnchainSignerButton from '@/common/components/ConfirmOnchainSignerButton';
-import SwitchWalletButton from '@/common/components/SwitchWalletButton';
-import { getTimestamp } from '@/common/helpers/farcaster';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AlertDialogDemo from '@/common/components/AlertDialog';
-import AccountManagementModal from '@/common/components/AccountManagement/AccountManagementModal';
-import { cn } from '@/lib/utils';
-import { filter } from 'lodash';
+} from '@/common/helpers/warpcastLogin'
+import HelpCard from '@/common/components/HelpCard'
+import { useIsMounted } from '@/common/helpers/hooks'
+import { useRouter } from 'next/router'
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
+import { openWindow } from '@/common/helpers/navigation'
+import ConfirmOnchainSignerButton from '@/common/components/ConfirmOnchainSignerButton'
+import SwitchWalletButton from '@/common/components/SwitchWalletButton'
+import { getTimestamp } from '@/common/helpers/farcaster'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import AlertDialogDemo from '@/common/components/AlertDialog'
+import AccountManagementModal from '@/common/components/AccountManagement/AccountManagementModal'
+import { cn } from '@/lib/utils'
+import { filter } from 'lodash'
 
-const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!);
+const APP_FID = Number(process.env.NEXT_PUBLIC_APP_FID!)
 
 enum SignupStateEnum {
   'initial',
@@ -43,66 +43,66 @@ enum SignupStateEnum {
 }
 
 export default function Accounts() {
-  const router = useRouter();
-  const [signupState, setSignupState] = useState<SignupStateEnum>(SignupStateEnum.initial);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { isConnected } = useAccount();
-  const isMounted = useIsMounted();
-  const [selectedAccount, setSelectedAccount] = useState<AccountObjectType>();
+  const router = useRouter()
+  const [signupState, setSignupState] = useState<SignupStateEnum>(SignupStateEnum.initial)
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { isConnected } = useAccount()
+  const isMounted = useIsMounted()
+  const [selectedAccount, setSelectedAccount] = useState<AccountObjectType>()
 
-  const { accounts, addAccount, setAccountActive, removeAccount, updateAccountUsername } = useAccountStore();
+  const { accounts, addAccount, setAccountActive, removeAccount, updateAccountUsername } = useAccountStore()
 
   const pendingAccounts =
     accounts.filter(
       (account) => account.status === AccountStatusType.pending && account.platform === AccountPlatformType.farcaster
-    ) || [];
+    ) || []
   const hasOnlyLocalAccounts =
-    accounts.length && accounts.every((account) => account.platform === AccountPlatformType.farcaster_local_readonly);
-  const hasPendingNewAccounts = pendingAccounts.length > 0;
-  const pendingAccount = hasPendingNewAccounts ? pendingAccounts[0] : null;
+    accounts.length && accounts.every((account) => account.platform === AccountPlatformType.farcaster_local_readonly)
+  const hasPendingNewAccounts = pendingAccounts.length > 0
+  const pendingAccount = hasPendingNewAccounts ? pendingAccounts[0] : null
 
   useEffect(() => {
     if (pendingAccounts?.length && signupState === SignupStateEnum.connecting) {
-      pendingAccounts.forEach((account) => pollForSigner(account.id));
+      pendingAccounts.forEach((account) => pollForSigner(account.id))
     }
-  }, [signupState, pendingAccounts, isMounted()]);
+  }, [signupState, pendingAccounts, isMounted()])
 
   useEffect(() => {
     if (hasPendingNewAccounts && signupState === SignupStateEnum.initial) {
-      setSignupState(SignupStateEnum.connecting);
+      setSignupState(SignupStateEnum.connecting)
     } else if (!hasPendingNewAccounts && signupState === SignupStateEnum.connecting) {
-      setSignupState(SignupStateEnum.initial);
+      setSignupState(SignupStateEnum.initial)
     }
-  }, [signupState, hasPendingNewAccounts]);
+  }, [signupState, hasPendingNewAccounts])
 
   const onClickManageAccount = (account: AccountObjectType) => {
-    setSelectedAccount(account);
-    setModalOpen(true);
-  };
+    setSelectedAccount(account)
+    setModalOpen(true)
+  }
 
   const refreshAccountNames = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     await Promise.all(accounts.map(async (account) => await updateAccountUsername(account.id)))
       .then(async () => {
-        console.log('All account names refreshed successfully');
-        await hydrateAccounts();
+        console.log('All account names refreshed successfully')
+        await hydrateAccounts()
       })
-      .catch((error) => console.error('Error refreshing account names:', error));
-    setIsLoading(false);
-  };
+      .catch((error) => console.error('Error refreshing account names:', error))
+    setIsLoading(false)
+  }
 
   const onCreateNewAccount = async () => {
-    const { publicKey, privateKey, signature, requestFid, deadline } = await generateWarpcastSigner();
+    const { publicKey, privateKey, signature, requestFid, deadline } = await generateWarpcastSigner()
     const { token, deeplinkUrl } = await callCreateSignerRequest({
       publicKey,
       requestFid,
       signature,
       deadline,
-    });
+    })
 
     try {
-      setIsLoading(true);
+      setIsLoading(true)
       await addAccount({
         account: {
           platformAccountId: undefined,
@@ -112,53 +112,53 @@ export default function Accounts() {
           privateKey,
           data: { signerToken: token, deeplinkUrl, deadline },
         },
-      });
-      setIsLoading(false);
-      setSignupState(SignupStateEnum.connecting);
+      })
+      setIsLoading(false)
+      setSignupState(SignupStateEnum.connecting)
     } catch (e) {
-      console.log('error when trying to add account', e);
-      setIsLoading(false);
-      setSignupState(SignupStateEnum.initial);
+      console.log('error when trying to add account', e)
+      setIsLoading(false)
+      setSignupState(SignupStateEnum.initial)
     }
-  };
+  }
 
   const checkStatusAndActiveAccount = async (pendingAccount: AccountObjectType) => {
-    if (!pendingAccount?.data?.signerToken) return;
+    if (!pendingAccount?.data?.signerToken) return
 
-    const deadline = pendingAccount.data?.deadline;
+    const deadline = pendingAccount.data?.deadline
     if (deadline && getTimestamp() > deadline) {
-      await removeAccount(pendingAccount.id);
-      return;
+      await removeAccount(pendingAccount.id)
+      return
     }
 
-    const { status, data } = await getWarpcastSignerStatus(pendingAccount.data.signerToken);
+    const { status, data } = await getWarpcastSignerStatus(pendingAccount.data.signerToken)
     if (status === WarpcastLoginStatus.success) {
-      const fid = data.userFid;
-      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!);
-      const user = (await neynarClient.fetchBulkUsers([fid], { viewerFid: APP_FID! })).users[0];
+      const fid = data.userFid
+      const neynarClient = new NeynarAPIClient(process.env.NEXT_PUBLIC_NEYNAR_API_KEY!)
+      const user = (await neynarClient.fetchBulkUsers([fid], { viewerFid: APP_FID! })).users[0]
       await setAccountActive(pendingAccount.id, user.username, {
         platform_account_id: user.fid.toString(),
         data,
-      });
-      await hydrateAccounts();
-      window.location.reload();
+      })
+      await hydrateAccounts()
+      window.location.reload()
     }
-  };
+  }
 
   const pollForSigner = async (accountId: string) => {
-    let tries = 0;
+    let tries = 0
     while (tries < 60) {
-      tries += 1;
-      await new Promise((r) => setTimeout(r, 2000));
+      tries += 1
+      await new Promise((r) => setTimeout(r, 2000))
 
-      const account = useAccountStore.getState().accounts.find((account) => account.id === accountId);
-      if (!account) return;
+      const account = useAccountStore.getState().accounts.find((account) => account.id === accountId)
+      if (!account) return
 
-      await checkStatusAndActiveAccount(account);
+      await checkStatusAndActiveAccount(account)
 
-      if (!isMounted()) return;
+      if (!isMounted()) return
     }
-  };
+  }
 
   const renderSignupForNonLocalAccount = () => (
     <Card>
@@ -181,7 +181,7 @@ export default function Accounts() {
         </Button>
       </CardFooter>
     </Card>
-  );
+  )
 
   const renderCreateSignerStep = () => (
     <Card>
@@ -196,10 +196,10 @@ export default function Accounts() {
         </Button>
       </CardFooter>
     </Card>
-  );
+  )
 
   const renderConnectAccountStep = () => {
-    if (isEmpty(pendingAccounts)) return null;
+    if (isEmpty(pendingAccounts)) return null
 
     return (
       <div className="grid grid-cols-1 gap-4">
@@ -240,8 +240,8 @@ export default function Accounts() {
           <CardFooter></CardFooter>
         </Card>
       </div>
-    );
-  };
+    )
+  }
 
   const renderCreateNewOnchainAccountCard = () => (
     <Card>
@@ -259,12 +259,12 @@ export default function Accounts() {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 
   const renderActiveAccountsOverview = () => {
-    const activeAccounts = filter(accounts, (account) => account.status === 'active');
+    const activeAccounts = filter(accounts, (account) => account.status === 'active')
 
-    if (isEmpty(activeAccounts)) return null;
+    if (isEmpty(activeAccounts)) return null
 
     return (
       <>
@@ -285,8 +285,8 @@ export default function Accounts() {
           ))}
         </ul>
       </>
-    );
-  };
+    )
+  }
 
   const renderFullAccountTabs = () => {
     return (
@@ -372,8 +372,8 @@ export default function Accounts() {
           </div>
         </TabsContent>
       </Tabs>
-    );
-  };
+    )
+  }
 
   return (
     <div className="pt-4 flex min-h-screen w-full flex-col bg-muted/40">
@@ -386,5 +386,5 @@ export default function Accounts() {
       </main>
       <AccountManagementModal account={selectedAccount} open={isModalOpen} setOpen={setModalOpen} />
     </div>
-  );
+  )
 }

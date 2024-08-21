@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { useAccountStore } from '../../src/stores/useAccountStore';
-import isEmpty from 'lodash.isempty';
-import { ChannelType } from '../../src/common/constants/channels';
-import findIndex from 'lodash.findindex';
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
-import SortableList, { SortableItem } from 'react-easy-sort';
-import { take } from 'lodash';
-import Fuse from 'fuse.js';
-import map from 'lodash.map';
-import orderBy from 'lodash.orderby';
-import { PersonIcon } from '@radix-ui/react-icons';
-import { formatLargeNumber } from '@/common/helpers/text';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/router';
-import filter from 'lodash.filter';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react'
+import { useAccountStore } from '../../src/stores/useAccountStore'
+import isEmpty from 'lodash.isempty'
+import { ChannelType } from '../../src/common/constants/channels'
+import findIndex from 'lodash.findindex'
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import SortableList, { SortableItem } from 'react-easy-sort'
+import { take } from 'lodash'
+import Fuse from 'fuse.js'
+import map from 'lodash.map'
+import orderBy from 'lodash.orderby'
+import { PersonIcon } from '@radix-ui/react-icons'
+import { formatLargeNumber } from '@/common/helpers/text'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/router'
+import filter from 'lodash.filter'
+import { cn } from '@/lib/utils'
 
 export default function Channels() {
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState('')
   const {
     setSelectedChannelUrl,
     addPinnedChannel,
@@ -27,32 +27,32 @@ export default function Channels() {
     isHydrated,
     allChannels,
     updatedPinnedChannelIndices,
-  } = useAccountStore();
+  } = useAccountStore()
 
-  const channels = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels || []);
+  const channels = useAccountStore((state) => state.accounts[state.selectedAccountIdx]?.channels || [])
 
   const fuse = new Fuse(allChannels, {
     keys: ['name', 'url'],
-  });
+  })
 
   const searchResults = take(
     searchTerm
       ? map(fuse.search(searchTerm), 'item')
       : orderBy(filter(allChannels, 'data.followerCount'), 'data.followerCount', 'desc'),
     50
-  );
+  )
 
   const onSortEnd = (oldIndex: number, newIndex: number) => {
-    updatedPinnedChannelIndices({ oldIndex, newIndex });
-  };
+    updatedPinnedChannelIndices({ oldIndex, newIndex })
+  }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value.toLowerCase());
-  };
+    setSearchTerm(e.target.value.toLowerCase())
+  }
 
   const renderChannelCard = (channel: ChannelType, idx?: number) => {
-    const index = findIndex(channels, ['url', channel.url]);
-    const enabled = index !== -1;
+    const index = findIndex(channels, ['url', channel.url])
+    const enabled = index !== -1
 
     return (
       <div className={cn(enabled ? 'cursor-move' : '', 'flex flex-row w-full max-w-lg')}>
@@ -97,8 +97,8 @@ export default function Channels() {
             size="sm"
             className="mr-2"
             onClick={() => {
-              setSelectedChannelUrl(channel.url);
-              router.push('/feeds');
+              setSelectedChannelUrl(channel.url)
+              router.push('/feeds')
             }}
           >
             View
@@ -112,14 +112,14 @@ export default function Channels() {
           </Button>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderEmptyState = () => (
     <div className="p-12">
       <span className="text-muted-foreground">Empty, no channels found</span>
     </div>
-  );
+  )
 
   const renderPinnedChannels = () => {
     return (
@@ -147,8 +147,8 @@ export default function Channels() {
           )}
         </ul>
       </div>
-    );
-  };
+    )
+  }
 
   const renderAllChannels = () => {
     return (
@@ -200,11 +200,11 @@ export default function Channels() {
           ))}
         </ul>
       </div>
-    );
-  };
+    )
+  }
 
   if (!isHydrated) {
-    return null;
+    return null
   }
 
   return isEmpty(accounts) ? (
@@ -216,5 +216,5 @@ export default function Channels() {
         {renderAllChannels()}
       </div>
     </>
-  );
+  )
 }
